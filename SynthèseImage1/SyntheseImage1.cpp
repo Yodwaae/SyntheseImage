@@ -12,17 +12,38 @@ int main()
 class Vector3 {
 
     private:
+
         double _a, _b, _c;
 
     public:
+
+        
+
+        #pragma region ===== CONSTRUCTORS =====
+        
+        // Default
         Vector3():
         _a(0), _b(0), _c(0){}
 
+        // From scalar
+        Vector3(double scal):
+        _a(scal), _b(scal), _c(scal){}
+
+        // Explicit
         Vector3(double x, double y, double z):
         _a(x), _b(y), _c(z){}
-        
-        //region ===== OPERATORS =====
 
+        #pragma endregion
+        
+        #pragma region ===== OPERATORS =====
+
+        #pragma region === ARITHMETIC OPERATORS ===
+
+        //HINT : If dividing by 0 will not crash but instead return +inf/-inf or NaN depending on the case
+
+        #pragma region PURE/VALUE OPERATORS
+
+        // ADDITION
         Vector3 operator+(const Vector3& other) const {
             double newA = _a + other._a;
             double newB = _b + other._b;
@@ -32,6 +53,7 @@ class Vector3 {
             return Vector3(newA, newB, newC);
         }
 
+        // SUBSTRACTION
         Vector3 operator-(const Vector3& other) const {
             double newA = _a - other._a;
             double newB = _b - other._b;
@@ -40,6 +62,7 @@ class Vector3 {
             return Vector3(newA, newB, newC);
         }
 
+        // MULTIPLICATION
         Vector3 operator*(const Vector3& other) const {
             double newA = _a * other._a;
             double newB = _b * other._b;
@@ -48,6 +71,7 @@ class Vector3 {
             return Vector3(newA, newB, newC);
         }
 
+        // SCALAR MULTIPLICATION
         Vector3 operator*(const float amount) const {
             double newA = _a * amount;
             double newB = _b * amount;
@@ -56,9 +80,98 @@ class Vector3 {
             return Vector3(newA, newB, newC);
         }
 
-        //endregion
+        // DIVISION
+        Vector3 operator/(const Vector3& other) const {
+            double newA = _a / other._a;
+            double newB = _b / other._b;
+            double newC = _c / other._c;
 
-        //region ===== OPERATORS FUNCTIONS =====
+            return Vector3(newA, newB, newC);
+        }
+
+        // SCALAR DIVISION
+        Vector3 operator/(const float amount) const {
+            double newA = _a / amount;
+            double newB = _b / amount;
+            double newC = _c / amount;
+
+            return Vector3(newA, newB, newC);
+        }
+
+        #pragma endregion
+
+        #pragma region IN PLACE OPERATORS
+
+        // IN PLACE ADDITION
+        void operator+=(const Vector3& other){
+            _a += other._a;
+            _b += other._b;
+            _c += other._c;
+
+        }
+
+        // IN PLACE SUBSTRACTION
+        void operator-(const Vector3& other){
+            _a -= other._a;
+            _b -= other._b;
+            _c -= other._c;
+
+        }
+
+        // IN PLACE MULTIPLICATION
+        void operator*(const Vector3& other){
+            _a *= other._a;
+            _b *= other._b;
+            _c *= other._c;
+
+        }
+
+        // IN PLACE SCALAR MULTIPLICATION
+        void operator*(const float amount){
+            _a *= amount;
+            _b *= amount;
+            _c *= amount;
+
+        }
+
+        // IN PLACE DIVISION
+        void operator/(const Vector3& other){
+            _a /= other._a;
+            _b /= other._b;
+            _c /= other._c;
+
+        }
+
+        // IN PLACE SCALAR DIVISION
+        void operator/(const float amount){
+            _a /= amount;
+            _b /= amount;
+            _c /= amount;
+
+        }
+
+        #pragma endregion
+
+        # pragma endregion
+
+        // EQUAL COMPARISON
+        bool operator==(const Vector3& other) const {
+            
+            if (_a == other._a && _b == other._b && _c == other._c)
+                return true;
+
+            return false;
+        }
+
+        // NOT EQUAL COMPARISON
+        bool operator!=(const Vector3& other) const {
+
+            return !(*this == other);
+        }
+
+        #pragma endregion
+
+        #pragma region ===== FUNCTIONS =====
 
         const double dot(const Vector3& other) {
 
@@ -84,7 +197,23 @@ class Vector3 {
             return res;
         }
 
-        //endregion
+        const double lengthSquared() {
+
+            double res = this->dot(*this);
+
+            return res;
+        }
+
+        const bool isZero() {
+
+            // Pretty sure it wonk work as == 0 isn't reliable
+            if (_a == 0 && _b == 0 && _c == 0)
+                return true;
+
+            return false;
+        }
+
+        #pragma endregion
 
 };
 
@@ -94,12 +223,24 @@ class Point {
         Vector3 myVect;
 
     public:
+
+        //region ===== OPERATORS =====
+
+        // POINT + DIRECTION
         Vector3 operator+(const Direction& other) {
             Vector3 res = myVect + other.myVect;
 
             return res;
         }
 
+        // POINT - DIRECTION
+        Vector3 operator-(const Direction& other) {
+            Vector3 res = myVect - other.myVect;
+
+            return res;
+        }
+
+        //endregion
 
 };
 
