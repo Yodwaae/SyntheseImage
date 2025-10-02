@@ -1,15 +1,14 @@
-    // SynthèseImage1.cpp : Ce fichier contient la fonction 'main'. L'exécution du programme commence et se termine à cet endroit.
-    //
 
-    #include <iostream>
-    #include "SyntheseImage.h"
+#include <iostream>
+#include "SyntheseImage.h"
+#include <cmath>
 
 
-    int main()
-    {
+int main()
+{
+    Vector3 myVector = Vector3(1, 2, 3);
+}
 
-        Vector3 myVector = Vector3(1, 2, 3);
-    }
 
 #pragma region ========== VECTOR3 CLASS ==========
 
@@ -26,6 +25,10 @@
         // Explicit
         Vector3::Vector3(double x, double y, double z):
         _a(x), _b(y), _c(z){}
+
+        // Copy constructor (declared just for clarity sake as it's only a value copy, compiler created one would have worked this fine)
+        Vector3::Vector3(const Vector3& other):
+        _a(other._a), _b(other._b), _c(other._c){}
 
         #pragma endregion
         
@@ -167,38 +170,38 @@
 
         #pragma region ===== FUNCTIONS =====
 
-        const double Vector3::dot(const Vector3& other) {
+        const double Vector3::dot(const Vector3& other) const{
 
             double res = _a * other._a + _b * other._b + _c * other._c;
 
             return res;
         }
 
-        const double Vector3::unsafeIndex(int i) {
+        const double Vector3::unsafeIndex(int i) const{
             switch (i)
             {
             case 0: return _a;
             case 1: return _b;
             case 2: return _c;
-            default: throw "Index Out of Range";
+            default: throw "Index Out of Range"; //TODO Of course to implement better later
             }
         }
 
-        const double Vector3::length() {
+        const double Vector3::length() const{
 
             double res =  std::sqrt(this->dot(*this));
 
             return res;
         }
 
-        const double Vector3::lengthSquared() {
+        const double Vector3::lengthSquared() const{
 
             double res = this->dot(*this);
 
             return res;
         }
 
-        const bool Vector3::isZero() {
+        const bool Vector3::isZero() const{
 
             // Not the best implementation, should I allow a small delta to consider the value is 0 ?
             if (_a == 0 && _b == 0 && _c == 0)
@@ -216,26 +219,25 @@
 
     #pragma region ===== CONSTRUCTORS =====
 
-        // Default
-        Point::Point() {
-            myVect = Vector3::Vector3();
-        }
+    // Default
+    Point::Point() {
+        myVect = Vector3::Vector3();
+    }
 
-        // From scalar
-        Point::Point(double scal) {
-            myVect = Vector3::Vector3(scal);
-        }
+    // From scalar
+    Point::Point(double scal) {
+        myVect = Vector3::Vector3(scal);
+    }
 
-        // TODO Should maybe add a copy constructor to vec3
-        //Point::Point(Vector3 vec) {
-        //    myVect = Vector3(vec._a, vec._b, vec._c)
-        //}
+    // From Vec3
+    Point::Point(Vector3 vec) {
+        myVect = Vector3(vec);
+    }
 
-        Point::Point(double r, double g, double b) {
-            myVect = Vector3(r, g, b);
-        }
-
-
+    // Explicit
+    Point::Point(double x, double y, double z) {
+        myVect = Vector3(x, y, z);
+    }
 
     #pragma endregion
 
@@ -244,14 +246,14 @@
     // TODO Mark those function as const 
 
     // POINT + DIRECTION
-    Point Point::operator+(const Direction& other) {
+    Point Point::operator+(const Direction& other) const{
         Vector3 res = myVect + other.myVect;
 
         return Point(res);
     }
 
     // POINT - DIRECTION
-    Point Point::operator-(const Direction& other) {
+    Point Point::operator-(const Direction& other) const{
         Vector3 res = myVect - other.myVect;
 
         return Point(res);
@@ -261,26 +263,36 @@
 
 #pragma endregion
 
-//
-//        // POINT - DIRECTION
-//        Vector3 operator-(const Direction& other) {
-//            Vector3 res = myVect - other.myVect;
-//
-//            return res;
-//        }
-//
-//        //endregion
-//
-//};
-//
-//class Direction {
-//    private:
-//
-//        Vector3 myVect;
-//        friend class Point;
-//
-//};
-//
+
+#pragma region ========== DIRECTION ==========
+
+    #pragma region ===== CONSTRUCTORS =====
+
+    // Default
+        Direction::Direction() {
+            myVect = Vector3::Vector3();
+        }
+
+        // From scalar
+        Direction::Direction(double scal) {
+            myVect = Vector3::Vector3(scal);
+        }
+
+        // From Vec3
+        Direction::Direction(Vector3 vec) {
+            myVect = Vector3(vec);
+        }
+
+        // Explicit
+        Direction::Direction(double x, double y, double z) {
+            myVect = Vector3(x, y, z);
+        }
+
+    #pragma endregion
+
+#pragma endregion
+
+
 //class NormalizedDirection {
 //    private:
 //        Vector3 myVect;

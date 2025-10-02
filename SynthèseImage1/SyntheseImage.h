@@ -3,6 +3,10 @@
 
 //TODO Maybe harmonise indent size in the file
 
+// TEMP : Added anticipated class declaration to simplify things for the moment
+class Direction; // TODO Might need to have multiple header and cpp files in the future, for clarity sake
+class Point;
+
 class Vector3 {
 
 	private :
@@ -11,19 +15,20 @@ class Vector3 {
 
 	public:
 
-	#pragma region ===== CONSTRUCTORS =====
+		#pragma region ===== CONSTRUCTORS =====
 
-		Vector3();
-		Vector3(double scal);
-		Vector3(double x, double y, double z);
+			Vector3();
+			Vector3(const Vector3& other);
+			Vector3(double scal);
+			Vector3(double x, double y, double z);
 
-	#pragma endregion
+		#pragma endregion
 
-	#pragma region ===== OPERATORS =====
+		#pragma region ===== OPERATORS =====
 
-	#pragma region === ARITHMETIC OPERATORS ===
+		#pragma region === ARITHMETIC OPERATORS ===
 
-	#pragma region PURE/VALUE OPERATORS
+		#pragma region PURE/VALUE OPERATORS
 
 		Vector3 operator+(const Vector3& other) const;
 		Vector3 operator-(const Vector3& other) const;
@@ -34,9 +39,9 @@ class Vector3 {
 		Vector3 operator/(const float amount) const;
 		Vector3 operator*(const float amount) const;
 
-	#pragma endregion
+		#pragma endregion
 
-	#pragma region IN PLACE OPERATORS
+		#pragma region IN PLACE OPERATORS
 
 		void operator+=(const Vector3& other);
 		void operator-=(const Vector3& other);
@@ -47,49 +52,54 @@ class Vector3 {
 		void operator*(const float amount);
 		void operator/(const float amount);
 
-	#pragma endregion
+		#pragma endregion
 
-	#pragma endregion
+		#pragma endregion
 
-	bool operator==(const Vector3& other) const;
-	bool operator!=(const Vector3& other) const;
+		bool operator==(const Vector3& other) const;
+		bool operator!=(const Vector3& other) const;
 
-	#pragma endregion
+		#pragma endregion
 
-	#pragma region ===== FUNCTIONS =====
+		#pragma region ===== FUNCTIONS =====
 
-		const double dot(const Vector3& other);
-		const double unsafeIndex(int i);
-		const double length();
-		const double lengthSquared();
-		const bool isZero();
+		const double dot(const Vector3& other) const;
+		const double unsafeIndex(int i) const;
+		const double length() const;
+		const double lengthSquared() const;
+		const bool isZero() const;
 
-	#pragma endregion
+		#pragma endregion
 
 };
+
+
+// NOTE : For all classes, the Vect3 will be stored as value and not pointer as it is a lightweight object, simpler and safer
+// Also no need for copy constructor as in that case the compiler created one will work just fine
 
 class Point {
 
     private:
+
         Vector3 myVect;
 
     public:
 
-	#pragma region ===== CONSTRUCTORS =====
+		#pragma region ===== CONSTRUCTORS =====
 
 		Point();
 		Point(double scal);
 		Point(Vector3 vec);
 		Point(double x, double y, double z);
 
-	#pragma endregion
+		#pragma endregion
 		
 		#pragma region ===== OPERATORS =====
 
-		Point operator+(const Direction& other);
-		Point operator-(const Direction& other);
+		Point operator+(const Direction& other) const;
+		Point operator-(const Direction& other) const;
 
-       //endregion
+		#pragma endregion
 
 };
 
@@ -100,9 +110,15 @@ class Direction {
         friend class Point;
 
 	public:
+
+		#pragma region ===== CONSTRUCTORS =====
+
 		Direction();
 		Direction(double scal);
+		Direction(Vector3 vec);
 		Direction(double r, double g, double b);
+
+		#pragma endregion
 
 
 };
