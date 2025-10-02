@@ -1,11 +1,11 @@
 #include <iostream>
 
-
-//TODO Maybe harmonise indent size in the file
-
 // TEMP : Added anticipated class declaration to simplify things for the moment
 class Direction; // TODO Might need to have multiple header and cpp files in the future, for clarity sake
 class Point;
+class NormalizedDirection;
+class Color;
+class SurfaceAbsorption;
 
 class Vector3 {
 
@@ -104,10 +104,10 @@ class Point {
 };
 
 class Direction {
+
     private:
 
         Vector3 myVect;
-        friend class Point;
 
 	public:
 
@@ -126,5 +126,58 @@ class Direction {
 
 		#pragma endregion
 
+};
+
+class NormalisedDirection {
+
+	private:
+		Vector3 myVect;
+
+	public:
+
+		#pragma region ===== CONSTRUCTORS =====
+
+		NormalisedDirection();
+		NormalisedDirection(double scal);
+		NormalisedDirection(Vector3 vec);
+		NormalisedDirection(double r, double g, double b);
+
+		#pragma endregion
+
+};
+
+class Color {
+
+	private:
+		Vector3 myVect;
+
+	public:
+
+		#pragma region ===== CONSTRUCTORS =====
+
+		Color();
+		Color(double scal);
+		Color(Vector3 vec);
+		Color(double r, double g, double b);
+
+		#pragma endregion
+
+};
+
+class SurfaceAbsorption {
+
+	private:
+		Vector3 myVect;
+
+	public:
+
+		#pragma region ===== CONSTRUCTORS =====
+
+		SurfaceAbsorption();
+		SurfaceAbsorption(double scal);
+		SurfaceAbsorption(Vector3 vec);
+		SurfaceAbsorption(double r, double g, double b);
+
+		#pragma endregion
 
 };

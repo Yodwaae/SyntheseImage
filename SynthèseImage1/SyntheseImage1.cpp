@@ -270,29 +270,119 @@ int main()
 #pragma endregion
 
 
-#pragma region ========== DIRECTION ==========
+#pragma region ========== DIRECTION CLASS ==========
 
     #pragma region ===== CONSTRUCTORS =====
 
     // Default
-        Direction::Direction() {
-            myVect = Vector3::Vector3();
-        }
+    Direction::Direction() {
+        myVect = Vector3::Vector3();
+    }
 
-        // From scalar
-        Direction::Direction(double scal) {
-            myVect = Vector3::Vector3(scal);
-        }
+    // From scalar
+    Direction::Direction(double scal) {
+        myVect = Vector3::Vector3(scal);
+    }
 
-        // From Vec3
-        Direction::Direction(Vector3 vec) {
-            myVect = Vector3(vec);
-        }
+    // From Vec3
+    Direction::Direction(Vector3 vec) {
+        myVect = Vector3(vec);
+    }
 
-        // Explicit
-        Direction::Direction(double x, double y, double z) {
-            myVect = Vector3(x, y, z);
-        }
+    // Explicit
+    Direction::Direction(double x, double y, double z) {
+        myVect = Vector3(x, y, z);
+    }
+
+    #pragma endregion
+
+
+#pragma endregion
+
+
+#pragma region ========== NORMALISED DIRECTION CLASS ==========
+
+    #pragma region ===== CONSTRUCTORS =====
+
+    // Default
+    NormalisedDirection::NormalisedDirection() {
+        myVect = Vector3::Vector3();
+    }
+
+    // From scalar
+    NormalisedDirection::NormalisedDirection(double scal) {
+        myVect = Vector3::Vector3(scal);
+    }
+
+    // From Vec3
+    NormalisedDirection::NormalisedDirection(Vector3 vec) {
+        myVect = Vector3(vec);
+    }
+
+    // Explicit
+    NormalisedDirection::NormalisedDirection(double x, double y, double z) {
+        myVect = Vector3(x, y, z);
+    }
+
+    #pragma endregion
+
+
+#pragma endregion
+
+
+#pragma region ========== COLOR CLASS ==========
+
+    #pragma region ===== CONSTRUCTORS =====
+
+    // Default
+    Color::Color() {
+        myVect = Vector3::Vector3();
+    }
+
+    // From scalar
+    Color::Color(double scal) {
+        myVect = Vector3::Vector3(scal);
+    }
+
+    // From Vec3
+    Color::Color(Vector3 vec) {
+        myVect = Vector3(vec);
+    }
+
+    // Explicit
+    Color::Color(double x, double y, double z) {
+        myVect = Vector3(x, y, z);
+    }
+
+    #pragma endregion
+
+
+#pragma endregion
+
+
+#pragma region ========== SURFACE ABSORBTION CLASS ==========
+
+    #pragma region ===== CONSTRUCTORS =====
+
+    // Default
+    SurfaceAbsorption::SurfaceAbsorption() {
+        myVect = Vector3::Vector3();
+    }
+
+    // From scalar
+    SurfaceAbsorption::SurfaceAbsorption(double scal) {
+        myVect = Vector3::Vector3(scal);
+    }
+
+    // From Vec3
+    SurfaceAbsorption::SurfaceAbsorption(Vector3 vec) {
+        myVect = Vector3(vec);
+    }
+
+    // Explicit
+    SurfaceAbsorption::SurfaceAbsorption(double x, double y, double z) {
+        myVect = Vector3(x, y, z);
+    }
 
     #pragma endregion
 
