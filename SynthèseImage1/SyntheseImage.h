@@ -1,6 +1,8 @@
 #include <iostream>
 
 
+//TODO Maybe harmonise indent size in the file
+
 class Vector3 {
 
 	private :
@@ -37,7 +39,7 @@ class Vector3 {
 	#pragma region IN PLACE OPERATORS
 
 		void operator+=(const Vector3& other);
-		void operator-(const Vector3& other);
+		void operator-=(const Vector3& other);
 		void operator*(const Vector3& other);
 		void operator/(const Vector3& other);
 
@@ -56,10 +58,51 @@ class Vector3 {
 
 	#pragma region ===== FUNCTIONS =====
 
-	const double dot(const Vector3& other);
-	const double unsafeIndex(int i);
-	const double length();
-	const double lengthSquared();
-	const bool isZero();
+		const double dot(const Vector3& other);
+		const double unsafeIndex(int i);
+		const double length();
+		const double lengthSquared();
+		const bool isZero();
+
+	#pragma endregion
+
+};
+
+class Point {
+
+    private:
+        Vector3 myVect;
+
+    public:
+
+	#pragma region ===== CONSTRUCTORS =====
+
+		Point();
+		Point(double scal);
+		Point(Vector3 vec);
+		Point(double x, double y, double z);
+
+	#pragma endregion
+		
+		#pragma region ===== OPERATORS =====
+
+		Point operator+(const Direction& other);
+		Point operator-(const Direction& other);
+
+       //endregion
+
+};
+
+class Direction {
+    private:
+
+        Vector3 myVect;
+        friend class Point;
+
+	public:
+		Direction();
+		Direction(double scal);
+		Direction(double r, double g, double b);
+
 
 };

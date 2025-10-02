@@ -105,7 +105,7 @@
         }
 
         // IN PLACE SUBSTRACTION
-        void Vector3::operator-(const Vector3& other){
+        void Vector3::operator-=(const Vector3& other){
             _a -= other._a;
             _b -= other._b;
             _c -= other._c;
@@ -211,20 +211,56 @@
 
 #pragma endregion
 
-//class Point {
-//    private:
-//        Vector3 myVect;
-//
-//    public:
-//
-//        //region ===== OPERATORS =====
-//
-//        // POINT + DIRECTION
-//        Vector3 operator+(const Direction& other) {
-//            Vector3 res = myVect + other.myVect;
-//
-//            return res;
-//        }
+
+#pragma region ========== POINT CLASS ==========
+
+    #pragma region ===== CONSTRUCTORS =====
+
+        // Default
+        Point::Point() {
+            myVect = Vector3::Vector3();
+        }
+
+        // From scalar
+        Point::Point(double scal) {
+            myVect = Vector3::Vector3(scal);
+        }
+
+        // TODO Should maybe add a copy constructor to vec3
+        //Point::Point(Vector3 vec) {
+        //    myVect = Vector3(vec._a, vec._b, vec._c)
+        //}
+
+        Point::Point(double r, double g, double b) {
+            myVect = Vector3(r, g, b);
+        }
+
+
+
+    #pragma endregion
+
+    #pragma region ===== OPERATORS =====
+
+    // TODO Mark those function as const 
+
+    // POINT + DIRECTION
+    Point Point::operator+(const Direction& other) {
+        Vector3 res = myVect + other.myVect;
+
+        return Point(res);
+    }
+
+    // POINT - DIRECTION
+    Point Point::operator-(const Direction& other) {
+        Vector3 res = myVect - other.myVect;
+
+        return Point(res);
+    }
+
+    #pragma endregion
+
+#pragma endregion
+
 //
 //        // POINT - DIRECTION
 //        Vector3 operator-(const Direction& other) {
