@@ -100,51 +100,57 @@ int main()
         #pragma region IN PLACE OPERATORS
 
         // IN PLACE ADDITION
-        void Vector3::operator+=(const Vector3& other){
+        Vector3& Vector3::operator+=(const Vector3& other){
             _a += other._a;
             _b += other._b;
             _c += other._c;
 
+            return *this;
         }
 
         // IN PLACE SUBSTRACTION
-        void Vector3::operator-=(const Vector3& other){
+        Vector3& Vector3::operator-=(const Vector3& other){
             _a -= other._a;
             _b -= other._b;
             _c -= other._c;
 
+            return *this;
         }
 
         // IN PLACE MULTIPLICATION
-        void Vector3::operator*(const Vector3& other){
+        Vector3& Vector3::operator*(const Vector3& other){
             _a *= other._a;
             _b *= other._b;
             _c *= other._c;
 
+            return *this;
         }
 
         // IN PLACE SCALAR MULTIPLICATION
-        void Vector3::operator*(const float amount){
+        Vector3& Vector3::operator*(const float amount){
             _a *= amount;
             _b *= amount;
             _c *= amount;
 
+            return *this;
         }
 
         // IN PLACE DIVISION
-        void Vector3::operator/(const Vector3& other){
+        Vector3& Vector3::operator/(const Vector3& other){
             _a /= other._a;
             _b /= other._b;
             _c /= other._c;
 
+            return *this;
         }
 
         // IN PLACE SCALAR DIVISION
-        void Vector3::operator/(const float amount){
+        Vector3& Vector3::operator/(const float amount){
             _a /= amount;
             _b /= amount;
             _c /= amount;
 
+            return *this;
         }
 
         #pragma endregion
@@ -247,14 +253,14 @@ int main()
 
     // POINT + DIRECTION
     Point Point::operator+(const Direction& other) const{
-        Vector3 res = myVect + other.myVect;
+        Vector3 res = myVect + other.getVect();
 
         return Point(res);
     }
 
     // POINT - DIRECTION
     Point Point::operator-(const Direction& other) const{
-        Vector3 res = myVect - other.myVect;
+        Vector3 res = myVect - other.getVect();
 
         return Point(res);
     }
@@ -289,6 +295,7 @@ int main()
         }
 
     #pragma endregion
+
 
 #pragma endregion
 

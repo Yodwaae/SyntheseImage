@@ -43,14 +43,14 @@ class Vector3 {
 
 		#pragma region IN PLACE OPERATORS
 
-		void operator+=(const Vector3& other);
-		void operator-=(const Vector3& other);
-		void operator*(const Vector3& other);
-		void operator/(const Vector3& other);
+		Vector3& operator+=(const Vector3& other);
+		Vector3& operator-=(const Vector3& other);
+		Vector3& operator*(const Vector3& other);
+		Vector3& operator/(const Vector3& other);
 
 		// SCALAR
-		void operator*(const float amount);
-		void operator/(const float amount);
+		Vector3& operator*(const float amount);
+		Vector3& operator/(const float amount);
 
 		#pragma endregion
 
@@ -117,6 +117,12 @@ class Direction {
 		Direction(double scal);
 		Direction(Vector3 vec);
 		Direction(double r, double g, double b);
+
+		#pragma endregion
+
+		#pragma region ===== FUNCTIONS =====
+
+		Vector3 getVect() const { return myVect;}
 
 		#pragma endregion
 
