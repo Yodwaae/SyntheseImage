@@ -1,14 +1,54 @@
 
 #include <iostream>
+#include <fstream>
+#include <vector> // To be replaced with my own implementation
 #include "SyntheseImage.h"
 #include <cmath>
 
 
+using namespace std;
+
+// TEMP forward declaration (will become useless once moved to an other file)
+int writeImage(const string& filename, int width, int height, const vector<float>& vec);
+
 int main()
 {
-    Vector3 myVector = Vector3(1, 2, 3);
+
+    vector<float> vec{ 1, 1, 1, 1, 1, 1};
+    writeImage("test.ppm", 2, 3, vec);
+
+    return 0;
 }
 
+// To be moved to an other file later
+int writeImage(const string& filename, int width, int height, const vector<float>& vec) {
+    //NOTE Right now only create binary image, will replace with a vector of color instead of float in the future
+
+    // Creating file
+    ofstream out(filename);
+
+    if (!out) {
+        cerr << "Can't create output file !";
+        return -1;
+    }
+
+    // Writing the PPM Header (Mode, size, color range)
+    out << "P3\n" << width << " " << height << "\n255\n";
+
+    
+    // Writing the pixels to the file
+    for (int i = 0; i < width * height; i++) {
+        // TODO I'd prefer to implement this in a double loop using i and j to compute the index to check in the array
+
+        int gray = static_cast<int>(vec[i] * 255);
+        out << gray << " " << gray << " " << gray << " ";
+
+        // I don't find that very clear, seems to me like a complicated way to check if we need to go to the next line
+        if ((i + 1) % width == 0) out << "\n";
+    }
+    out.close();
+    return 0;
+}
 
 #pragma region ========== VECTOR3 CLASS ==========
 
