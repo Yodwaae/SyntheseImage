@@ -8,20 +8,32 @@
 
 using namespace std;
 
-// TEMP forward declaration (will become useless once moved to an other file)
-int writeImage(const string& filename, int width, int height, const vector<float>& vec);
+// TEMP forward declarations (will become useless once moved to an other file)
+int writeImage(const string& filename, int width, int height, const vector<Color>& vec);
+struct Ray;
+
 
 int main()
 {
 
-    vector<float> vec{ 1, 1, 1, 1, 1, 1};
-    writeImage("test.ppm", 2, 3, vec);
+    vector<Color> vec{ Color(255) };
+    writeImage("test.ppm", 1, 1, vec);
 
     return 0;
 }
 
 // To be moved to an other file later
-int writeImage(const string& filename, int width, int height, const vector<float>& vec) {
+#pragma region !!!!!! TEMPORARLY IN FILE !!!!!! 
+struct Ray {
+
+public:
+    Vector3 origin;
+    Vector3 direction;
+
+};
+
+
+int writeImage(const string& filename, int width, int height, const vector<Color>& vec) {
     //NOTE Right now only create binary image, will replace with a vector of color instead of float in the future
 
     // Creating file
@@ -37,18 +49,24 @@ int writeImage(const string& filename, int width, int height, const vector<float
 
     
     // Writing the pixels to the file
-    for (int i = 0; i < width * height; i++) {
-        // TODO I'd prefer to implement this in a double loop using i and j to compute the index to check in the array
+    for (int i = 0; i < height; i++) {
 
-        int gray = static_cast<int>(vec[i] * 255);
-        out << gray << " " << gray << " " << gray << " ";
+        for (int j = 0; j < width; j++) {
 
-        // I don't find that very clear, seems to me like a complicated way to check if we need to go to the next line
-        if ((i + 1) % width == 0) out << "\n";
+            int index = i * width + j;
+            Color color = vec[index];
+            out << color.getRed() << " " << color.getGreen() << " " << color.getBlue() << " ";
+
+        }
+        
+        // Go to the next line
+        out << "\n";
     }
     out.close();
     return 0;
 }
+
+#pragma endregion
 
 #pragma region ========== VECTOR3 CLASS ==========
 

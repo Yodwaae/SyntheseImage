@@ -69,6 +69,11 @@ class Vector3 {
 		const double lengthSquared() const;
 		const bool isZero() const;
 
+		const double getA() const { return _a; }
+		const double getB() const { return _b; }
+		const double getC() const { return _c; }
+
+
 		#pragma endregion
 
 };
@@ -122,7 +127,7 @@ class Direction {
 
 		#pragma region ===== FUNCTIONS =====
 
-		Vector3 getVect() const { return myVect;}
+		const Vector3& getVect() const { return myVect;}
 
 		#pragma endregion
 
@@ -159,6 +164,14 @@ class Color {
 		Color(double scal);
 		Color(Vector3 vec);
 		Color(double r, double g, double b);
+
+		#pragma endregion
+
+		#pragma region ===== FUNCTIONS =====
+
+		const double getRed() const { return myVect.getA(); }
+		const double getGreen() const { return myVect.getB(); }
+		const double getBlue() const{ return myVect.getC(); }
 
 		#pragma endregion
 
