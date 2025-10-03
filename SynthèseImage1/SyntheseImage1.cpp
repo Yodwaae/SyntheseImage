@@ -5,13 +5,15 @@
 #include "SyntheseImage.h"
 #include <cmath>
 
+// TODO Harmonise the usage of the float and double
+
 
 using namespace std;
 
 // TEMP forward declarations (will become useless once moved to an other file)
 int writeImage(const string& filename, int width, int height, const vector<Color>& vec);
 struct Ray;
-
+struct Sphere;
 
 int main()
 {
@@ -26,11 +28,55 @@ int main()
 #pragma region !!!!!! TEMPORARLY IN FILE !!!!!! 
 struct Ray {
 
-public:
-    Vector3 origin;
-    Vector3 direction;
+    public:
+        Point origin;
+        Vector3 direction;
 
 };
+
+
+struct Sphere {
+
+    public:
+        Point center;
+        float radius;
+
+};
+
+// TODO Temporary auto
+double rayIntersectSphere(Ray ray, Sphere sphere) {
+
+    // Initialisation
+    double radius = sphere.radius;
+    Point center = sphere.center;
+    Point origin = ray.origin;
+    Vector3 direction = ray.direction;
+
+
+    double oc = origin.DistanceTo(center);
+    double r2 = radius * radius;
+
+
+    // Setting the 3 terms of que equation system
+    double a = direction.dot();
+    double b = direction.dot(oc);
+    double c = oc * oc - r2;
+
+    // Solving the system
+    double delta = (b * b) - (4 * a * c);
+    double t0 = (-b - sqrt(delta)) / (2 * a);
+    double t1 = (-b + sqrt(delta)) / (2 * a);
+
+    if (delta < 0)
+        return NULL;
+    else if (t0 >= 0)
+        return t0;
+    else if (t1 >= 0)
+        return t1;
+    else
+        return 0;
+
+}
 
 
 int writeImage(const string& filename, int width, int height, const vector<Color>& vec) {
@@ -234,6 +280,20 @@ int writeImage(const string& filename, int width, int height, const vector<Color
 
         #pragma region ===== FUNCTIONS =====
 
+        const double Vector3::dot() const {
+
+            double res = _a * _a + _b * _b + _c * _c;
+
+            return res;
+        }
+
+        const double Vector3::dot(double scalar) const {
+
+            double res = _a * scalar + _b * scalar + _c * scalar;
+
+            return res;
+        }
+
         const double Vector3::dot(const Vector3& other) const{
 
             double res = _a * other._a + _b * other._b + _c * other._c;
@@ -253,14 +313,14 @@ int writeImage(const string& filename, int width, int height, const vector<Color
 
         const double Vector3::length() const{
 
-            double res =  std::sqrt(this->dot(*this));
+            double res =  sqrt(lengthSquared());
 
             return res;
         }
 
         const double Vector3::lengthSquared() const{
 
-            double res = this->dot(*this);
+            double res = dot();
 
             return res;
         }
@@ -321,6 +381,14 @@ int writeImage(const string& filename, int width, int height, const vector<Color
         Vector3 res = myVect - other.getVect();
 
         return Point(res);
+    }
+
+    // DISTANCE TO
+    double Point::DistanceTo(const Point& other) const {
+        Vector3 diff = myVect - other.myVect;
+        double distance = diff.dot();
+
+        return distance;
     }
 
     #pragma endregion

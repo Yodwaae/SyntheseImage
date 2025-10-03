@@ -63,6 +63,8 @@ class Vector3 {
 
 		#pragma region ===== FUNCTIONS =====
 
+		const double dot() const;
+		const double dot(double scalar) const;
 		const double dot(const Vector3& other) const;
 		const double unsafeIndex(int i) const;
 		const double length() const;
@@ -103,6 +105,13 @@ class Point {
 
 		Point operator+(const Direction& other) const;
 		Point operator-(const Direction& other) const;
+
+		#pragma endregion
+
+
+		#pragma region ===== FUNCTIONS =====
+
+		double DistanceTo(const Point& other) const;
 
 		#pragma endregion
 
