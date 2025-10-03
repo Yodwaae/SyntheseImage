@@ -6,34 +6,18 @@
 #include <cmath>
 
 // TODO Harmonise the usage of the float and double
-
+// TODO Need to do something about the redundancy of dot() and some * operator in Vec3
 
 using namespace std;
 
-// TEMP forward declarations (will become useless once moved to an other file)
-int writeImage(const string& filename, int width, int height, const vector<Color>& vec);
-struct Ray;
-struct Sphere;
-
-int main()
-{
-
-    vector<Color> vec{ Color(255) };
-    writeImage("test.ppm", 1, 1, vec);
-
-    return 0;
-}
-
-// To be moved to an other file later
-#pragma region !!!!!! TEMPORARLY IN FILE !!!!!! 
+// TODO To also be moved in an other file
 struct Ray {
 
     public:
         Point origin;
-        Vector3 direction;
+        Direction direction;
 
 };
-
 
 struct Sphere {
 
@@ -43,6 +27,45 @@ struct Sphere {
 
 };
 
+// TEMP forward declarations (will become useless once moved to an other file)
+int writeImage(const string& filename, int width, int height, const vector<Color>& vec);
+double rayIntersectSphere(Ray ray, Sphere sphere);
+
+int main()
+{
+    constexpr size_t WIDTH = 500;
+    constexpr size_t HEIGHT = 500;
+
+    vector<Color> colVec(WIDTH * HEIGHT);
+
+    Sphere sphere{ Point(250, 250, 300), 100 };
+
+    for (int x = 0; x < 500; x++) {
+
+        for (int y = 0; y < 500; y++) {
+            Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
+
+            double pixel = rayIntersectSphere(ray, sphere);
+
+            if (pixel > 0) {
+                colVec[y * WIDTH + x] = Color(255, 0, 0);  // red sphere
+            }
+            else {
+                colVec[y * WIDTH + x] = Color(0, 0, 0);    // background
+            }
+
+        }
+    }
+
+    writeImage("sphere.ppm", WIDTH, HEIGHT, colVec);
+
+    return 0;
+}
+
+// To be moved to an other file later
+#pragma region !!!!!! TEMPORARLY IN FILE !!!!!! 
+
+
 // TODO Temporary auto
 double rayIntersectSphere(Ray ray, Sphere sphere) {
 
@@ -50,17 +73,17 @@ double rayIntersectSphere(Ray ray, Sphere sphere) {
     double radius = sphere.radius;
     Point center = sphere.center;
     Point origin = ray.origin;
-    Vector3 direction = ray.direction;
+    Direction direction = ray.direction;
 
 
-    double oc = origin.DistanceTo(center);
+    Direction oc = origin.DistanceTo(center);
     double r2 = radius * radius;
 
 
     // Setting the 3 terms of que equation system
     double a = direction.dot();
-    double b = direction.dot(oc);
-    double c = oc * oc - r2;
+    double b = -2 * direction.dot(oc);
+    double c = oc.dot() - r2;
 
     // Solving the system
     double delta = (b * b) - (4 * a * c);
@@ -68,7 +91,7 @@ double rayIntersectSphere(Ray ray, Sphere sphere) {
     double t1 = (-b + sqrt(delta)) / (2 * a);
 
     if (delta < 0)
-        return NULL;
+        return -1;
     else if (t0 >= 0)
         return t0;
     else if (t1 >= 0)
@@ -116,225 +139,225 @@ int writeImage(const string& filename, int width, int height, const vector<Color
 
 #pragma region ========== VECTOR3 CLASS ==========
 
-        #pragma region ===== CONSTRUCTORS =====
+    #pragma region ===== CONSTRUCTORS =====
         
-        // Default
-        Vector3::Vector3():
-        _a(0), _b(0), _c(0){}
+    // Default
+    Vector3::Vector3():
+    _a(0), _b(0), _c(0){}
 
-        // From scalar
-        Vector3::Vector3(double scal):
-        _a(scal), _b(scal), _c(scal){}
+    // From scalar
+    Vector3::Vector3(double scal):
+    _a(scal), _b(scal), _c(scal){}
 
-        // Explicit
-        Vector3::Vector3(double x, double y, double z):
-        _a(x), _b(y), _c(z){}
+    // Explicit
+    Vector3::Vector3(double x, double y, double z):
+    _a(x), _b(y), _c(z){}
 
-        // Copy constructor (declared just for clarity sake as it's only a value copy, compiler created one would have worked this fine)
-        Vector3::Vector3(const Vector3& other):
-        _a(other._a), _b(other._b), _c(other._c){}
+    // Copy constructor (declared just for clarity sake as it's only a value copy, compiler created one would have worked this fine)
+    Vector3::Vector3(const Vector3& other):
+    _a(other._a), _b(other._b), _c(other._c){}
 
-        #pragma endregion
+    #pragma endregion
         
-        #pragma region ===== OPERATORS =====
+    #pragma region ===== OPERATORS =====
 
-        #pragma region === ARITHMETIC OPERATORS ===
+    #pragma region === ARITHMETIC OPERATORS ===
 
-        //HINT : If dividing by 0 will not crash but instead return +inf/-inf or NaN depending on the case
+    //HINT : If dividing by 0 will not crash but instead return +inf/-inf or NaN depending on the case
 
-        #pragma region PURE/VALUE OPERATORS
+    #pragma region PURE/VALUE OPERATORS
 
-        // ADDITION
-        Vector3 Vector3::operator+(const Vector3& other) const {
-            double newA = _a + other._a;
-            double newB = _b + other._b;
-            double newC = _c + other._c;
+    // ADDITION
+    Vector3 Vector3::operator+(const Vector3& other) const {
+        double newA = _a + other._a;
+        double newB = _b + other._b;
+        double newC = _c + other._c;
 
 
-            return Vector3(newA, newB, newC);
-        }
+        return Vector3(newA, newB, newC);
+    }
 
-        // SUBSTRACTION
-        Vector3 Vector3::operator-(const Vector3& other) const {
-            double newA = _a - other._a;
-            double newB = _b - other._b;
-            double newC = _c - other._c;
+    // SUBSTRACTION
+    Vector3 Vector3::operator-(const Vector3& other) const {
+        double newA = _a - other._a;
+        double newB = _b - other._b;
+        double newC = _c - other._c;
 
-            return Vector3(newA, newB, newC);
-        }
+        return Vector3(newA, newB, newC);
+    }
 
-        // MULTIPLICATION
-        Vector3 Vector3::operator*(const Vector3& other) const {
-            double newA = _a * other._a;
-            double newB = _b * other._b;
-            double newC = _c * other._c;
+    // MULTIPLICATION
+    Vector3 Vector3::operator*(const Vector3& other) const {
+        double newA = _a * other._a;
+        double newB = _b * other._b;
+        double newC = _c * other._c;
 
-            return Vector3(newA, newB, newC);
-        }
+        return Vector3(newA, newB, newC);
+    }
 
-        // SCALAR MULTIPLICATION
-        Vector3 Vector3::operator*(const float amount) const {
-            double newA = _a * amount;
-            double newB = _b * amount;
-            double newC = _c * amount;
+    // SCALAR MULTIPLICATION
+    Vector3 Vector3::operator*(const float amount) const {
+        double newA = _a * amount;
+        double newB = _b * amount;
+        double newC = _c * amount;
 
-            return Vector3(newA, newB, newC);
-        }
+        return Vector3(newA, newB, newC);
+    }
 
-        // DIVISION
-        Vector3 Vector3::operator/(const Vector3& other) const {
-            double newA = _a / other._a;
-            double newB = _b / other._b;
-            double newC = _c / other._c;
+    // DIVISION
+    Vector3 Vector3::operator/(const Vector3& other) const {
+        double newA = _a / other._a;
+        double newB = _b / other._b;
+        double newC = _c / other._c;
 
-            return Vector3(newA, newB, newC);
-        }
+        return Vector3(newA, newB, newC);
+    }
 
-        // SCALAR DIVISION
-        Vector3 Vector3::operator/(const float amount) const {
-            double newA = _a / amount;
-            double newB = _b / amount;
-            double newC = _c / amount;
+    // SCALAR DIVISION
+    Vector3 Vector3::operator/(const float amount) const {
+        double newA = _a / amount;
+        double newB = _b / amount;
+        double newC = _c / amount;
 
-            return Vector3(newA, newB, newC);
-        }
+        return Vector3(newA, newB, newC);
+    }
 
-        #pragma endregion
+    #pragma endregion
 
-        #pragma region IN PLACE OPERATORS
+    #pragma region IN PLACE OPERATORS
 
-        // IN PLACE ADDITION
-        Vector3& Vector3::operator+=(const Vector3& other){
-            _a += other._a;
-            _b += other._b;
-            _c += other._c;
+    // IN PLACE ADDITION
+    Vector3& Vector3::operator+=(const Vector3& other){
+        _a += other._a;
+        _b += other._b;
+        _c += other._c;
 
-            return *this;
-        }
+        return *this;
+    }
 
-        // IN PLACE SUBSTRACTION
-        Vector3& Vector3::operator-=(const Vector3& other){
-            _a -= other._a;
-            _b -= other._b;
-            _c -= other._c;
+    // IN PLACE SUBSTRACTION
+    Vector3& Vector3::operator-=(const Vector3& other){
+        _a -= other._a;
+        _b -= other._b;
+        _c -= other._c;
 
-            return *this;
-        }
+        return *this;
+    }
 
-        // IN PLACE MULTIPLICATION
-        Vector3& Vector3::operator*(const Vector3& other){
-            _a *= other._a;
-            _b *= other._b;
-            _c *= other._c;
+    // IN PLACE MULTIPLICATION
+    Vector3& Vector3::operator*(const Vector3& other){
+        _a *= other._a;
+        _b *= other._b;
+        _c *= other._c;
 
-            return *this;
-        }
+        return *this;
+    }
 
-        // IN PLACE SCALAR MULTIPLICATION
-        Vector3& Vector3::operator*(const float amount){
-            _a *= amount;
-            _b *= amount;
-            _c *= amount;
+    // IN PLACE SCALAR MULTIPLICATION
+    Vector3& Vector3::operator*(const float amount){
+        _a *= amount;
+        _b *= amount;
+        _c *= amount;
 
-            return *this;
-        }
+        return *this;
+    }
 
-        // IN PLACE DIVISION
-        Vector3& Vector3::operator/(const Vector3& other){
-            _a /= other._a;
-            _b /= other._b;
-            _c /= other._c;
+    // IN PLACE DIVISION
+    Vector3& Vector3::operator/(const Vector3& other){
+        _a /= other._a;
+        _b /= other._b;
+        _c /= other._c;
 
-            return *this;
-        }
+        return *this;
+    }
 
-        // IN PLACE SCALAR DIVISION
-        Vector3& Vector3::operator/(const float amount){
-            _a /= amount;
-            _b /= amount;
-            _c /= amount;
+    // IN PLACE SCALAR DIVISION
+    Vector3& Vector3::operator/(const float amount){
+        _a /= amount;
+        _b /= amount;
+        _c /= amount;
 
-            return *this;
-        }
+        return *this;
+    }
 
-        #pragma endregion
+    #pragma endregion
 
-        # pragma endregion
+    # pragma endregion
 
-        // EQUAL COMPARISON
-        bool Vector3::operator==(const Vector3& other) const {
+    // EQUAL COMPARISON
+    bool Vector3::operator==(const Vector3& other) const {
             
-            if (_a == other._a && _b == other._b && _c == other._c)
-                return true;
+        if (_a == other._a && _b == other._b && _c == other._c)
+            return true;
 
-            return false;
+        return false;
+    }
+
+    // NOT EQUAL COMPARISON
+    bool Vector3::operator!=(const Vector3& other) const {
+
+        return !(*this == other);
+    }
+
+    #pragma endregion
+
+    #pragma region ===== FUNCTIONS =====
+
+    const double Vector3::dot() const {
+
+        double res = _a * _a + _b * _b + _c * _c;
+
+        return res;
+    }
+
+    const double Vector3::dot(double scalar) const {
+
+        double res = _a * scalar + _b * scalar + _c * scalar;
+
+        return res;
+    }
+
+    const double Vector3::dot(const Vector3& other) const{
+
+        double res = _a * other._a + _b * other._b + _c * other._c;
+
+        return res;
+    }
+
+    const double Vector3::unsafeIndex(int i) const{
+        switch (i)
+        {
+        case 0: return _a;
+        case 1: return _b;
+        case 2: return _c;
+        default: throw "Index Out of Range"; //TODO Of course to implement better later
         }
+    }
 
-        // NOT EQUAL COMPARISON
-        bool Vector3::operator!=(const Vector3& other) const {
+    const double Vector3::length() const{
 
-            return !(*this == other);
-        }
+        double res =  sqrt(lengthSquared());
 
-        #pragma endregion
+        return res;
+    }
 
-        #pragma region ===== FUNCTIONS =====
+    const double Vector3::lengthSquared() const{
 
-        const double Vector3::dot() const {
+        double res = dot();
 
-            double res = _a * _a + _b * _b + _c * _c;
+        return res;
+    }
 
-            return res;
-        }
+    const bool Vector3::isZero() const{
 
-        const double Vector3::dot(double scalar) const {
+        // Not the best implementation, should I allow a small delta to consider the value is 0 ?
+        if (_a == 0 && _b == 0 && _c == 0)
+            return true;
 
-            double res = _a * scalar + _b * scalar + _c * scalar;
+        return false;
+    }
 
-            return res;
-        }
-
-        const double Vector3::dot(const Vector3& other) const{
-
-            double res = _a * other._a + _b * other._b + _c * other._c;
-
-            return res;
-        }
-
-        const double Vector3::unsafeIndex(int i) const{
-            switch (i)
-            {
-            case 0: return _a;
-            case 1: return _b;
-            case 2: return _c;
-            default: throw "Index Out of Range"; //TODO Of course to implement better later
-            }
-        }
-
-        const double Vector3::length() const{
-
-            double res =  sqrt(lengthSquared());
-
-            return res;
-        }
-
-        const double Vector3::lengthSquared() const{
-
-            double res = dot();
-
-            return res;
-        }
-
-        const bool Vector3::isZero() const{
-
-            // Not the best implementation, should I allow a small delta to consider the value is 0 ?
-            if (_a == 0 && _b == 0 && _c == 0)
-                return true;
-
-            return false;
-        }
-
-        #pragma endregion
+    #pragma endregion
 
 #pragma endregion
 
@@ -383,12 +406,15 @@ int writeImage(const string& filename, int width, int height, const vector<Color
         return Point(res);
     }
 
-    // DISTANCE TO
-    double Point::DistanceTo(const Point& other) const {
-        Vector3 diff = myVect - other.myVect;
-        double distance = diff.dot();
+    #pragma endregion
 
-        return distance;
+    #pragma region ===== OPERATORS =====
+    
+    // DISTANCE TO
+    Direction Point::DistanceTo(const Point& other) const {
+        Direction res = other.myVect - myVect;
+
+        return res;
     }
 
     #pragma endregion
@@ -422,6 +448,30 @@ int writeImage(const string& filename, int width, int height, const vector<Color
 
     #pragma endregion
 
+    #pragma region ===== FUNCTIONS =====
+
+    const double Direction::dot() const {
+
+        double res = myVect.dot();
+
+        return res;
+    }
+
+    const double Direction::dot(double scalar) const {
+
+        double res = myVect.dot(scalar);
+
+        return res;
+    }
+
+    const double Direction::dot(const Direction& other) const {
+
+        double res = myVect.dot(other.myVect);
+
+        return res;
+    }
+
+    #pragma endregion
 
 #pragma endregion
 

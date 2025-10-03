@@ -111,7 +111,7 @@ class Point {
 
 		#pragma region ===== FUNCTIONS =====
 
-		double DistanceTo(const Point& other) const;
+		Direction DistanceTo(const Point& other) const;
 
 		#pragma endregion
 
@@ -137,6 +137,9 @@ class Direction {
 		#pragma region ===== FUNCTIONS =====
 
 		const Vector3& getVect() const { return myVect;}
+		const double dot() const;
+		const double dot(double scalar) const;
+		const double dot(const Direction& other) const;
 
 		#pragma endregion
 
