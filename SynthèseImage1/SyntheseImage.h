@@ -36,8 +36,8 @@ class Vector3 {
 		Vector3 operator/(const Vector3& other) const;
 
 		// SCALAR
-		Vector3 operator/(const float amount) const;
-		Vector3 operator*(const float amount) const;
+		Vector3 operator/(const double amount) const;
+		Vector3 operator*(const double amount) const;
 
 		#pragma endregion
 
@@ -49,8 +49,8 @@ class Vector3 {
 		Vector3& operator/(const Vector3& other);
 
 		// SCALAR
-		Vector3& operator*(const float amount);
-		Vector3& operator/(const float amount);
+		Vector3& operator*(const double amount);
+		Vector3& operator/(const double amount);
 
 		#pragma endregion
 
@@ -63,8 +63,6 @@ class Vector3 {
 
 		#pragma region ===== FUNCTIONS =====
 
-		const double dot() const;
-		const double dot(double scalar) const;
 		const double dot(const Vector3& other) const;
 		const double unsafeIndex(int i) const;
 		const double length() const;
@@ -137,8 +135,6 @@ class Direction {
 		#pragma region ===== FUNCTIONS =====
 
 		const Vector3& getVect() const { return myVect;}
-		const double dot() const;
-		const double dot(double scalar) const;
 		const double dot(const Direction& other) const;
 
 		#pragma endregion

@@ -1,16 +1,16 @@
 
 #include <iostream>
 #include <fstream>
-#include <vector> // To be replaced with my own implementation
-#include "SyntheseImage.h"
+#include <vector>
 #include <cmath>
+#include "SyntheseImage.h"
 
-// TODO Harmonise the usage of the float and double
-// TODO Need to do something about the redundancy of dot() and some * operator in Vec3
 
 using namespace std;
 
-// TODO To also be moved in an other file
+// To be moved to an other file later
+#pragma region !!!!!! TEMPORARLY IN FILE !!!!!! 
+
 struct Ray {
 
     public:
@@ -23,50 +23,10 @@ struct Sphere {
 
     public:
         Point center;
-        float radius;
+        double radius;
 
 };
 
-// TEMP forward declarations (will become useless once moved to an other file)
-int writeImage(const string& filename, int width, int height, const vector<Color>& vec);
-double rayIntersectSphere(Ray ray, Sphere sphere);
-
-int main()
-{
-    constexpr size_t WIDTH = 500;
-    constexpr size_t HEIGHT = 500;
-
-    vector<Color> colVec(WIDTH * HEIGHT);
-
-    Sphere sphere{ Point(250, 250, 300), 100 };
-
-    for (int x = 0; x < 500; x++) {
-
-        for (int y = 0; y < 500; y++) {
-            Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
-
-            double pixel = rayIntersectSphere(ray, sphere);
-
-            if (pixel > 0) {
-                colVec[y * WIDTH + x] = Color(255, 0, 0);  // red sphere
-            }
-            else {
-                colVec[y * WIDTH + x] = Color(0, 0, 0);    // background
-            }
-
-        }
-    }
-
-    writeImage("sphere.ppm", WIDTH, HEIGHT, colVec);
-
-    return 0;
-}
-
-// To be moved to an other file later
-#pragma region !!!!!! TEMPORARLY IN FILE !!!!!! 
-
-
-// TODO Temporary auto
 double rayIntersectSphere(Ray ray, Sphere sphere) {
 
     // Initialisation
@@ -81,9 +41,9 @@ double rayIntersectSphere(Ray ray, Sphere sphere) {
 
 
     // Setting the 3 terms of que equation system
-    double a = direction.dot();
+    double a = direction.dot(direction);
     double b = -2 * direction.dot(oc);
-    double c = oc.dot() - r2;
+    double c = oc.dot(oc) - r2;
 
     // Solving the system
     double delta = (b * b) - (4 * a * c);
@@ -101,9 +61,30 @@ double rayIntersectSphere(Ray ray, Sphere sphere) {
 
 }
 
+vector<Color> computeSphereIntersect(Sphere sphere, size_t WIDTH, size_t HEIGHT) {
+    // Initialising color vector<>
+    vector<Color> colVec(WIDTH * HEIGHT);
+
+    for (int x = 0; x < 500; x++) {
+        for (int y = 0; y < 500; y++) {
+
+            // Computing the intersect
+            Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
+            double pixel = rayIntersectSphere(ray, sphere);
+
+            // Setting pixel color depending on the result
+            if (pixel < 0) 
+                colVec[y * WIDTH + x] = Color(255, 0, 0);// Red background
+            else 
+                colVec[y * WIDTH + x] = Color(pixel); // Sphere
+
+        }
+    }
+
+    return colVec;
+}
 
 int writeImage(const string& filename, int width, int height, const vector<Color>& vec) {
-    //NOTE Right now only create binary image, will replace with a vector of color instead of float in the future
 
     // Creating file
     ofstream out(filename);
@@ -131,11 +112,26 @@ int writeImage(const string& filename, int width, int height, const vector<Color
         // Go to the next line
         out << "\n";
     }
+
+    // Close file and return success
     out.close();
     return 0;
 }
 
 #pragma endregion
+
+int main()
+{
+    constexpr size_t WIDTH = 500;
+    constexpr size_t HEIGHT = 500;
+
+    // Image creation
+    Sphere sphere{ Point(250, 250, 300), 200 };
+    vector<Color> colVec = computeSphereIntersect(sphere, WIDTH, HEIGHT);
+    writeImage("sphere.ppm", WIDTH, HEIGHT, colVec);
+
+    return 0;
+}
 
 #pragma region ========== VECTOR3 CLASS ==========
 
@@ -196,7 +192,7 @@ int writeImage(const string& filename, int width, int height, const vector<Color
     }
 
     // SCALAR MULTIPLICATION
-    Vector3 Vector3::operator*(const float amount) const {
+    Vector3 Vector3::operator*(const double amount) const {
         double newA = _a * amount;
         double newB = _b * amount;
         double newC = _c * amount;
@@ -214,7 +210,7 @@ int writeImage(const string& filename, int width, int height, const vector<Color
     }
 
     // SCALAR DIVISION
-    Vector3 Vector3::operator/(const float amount) const {
+    Vector3 Vector3::operator/(const double amount) const {
         double newA = _a / amount;
         double newB = _b / amount;
         double newC = _c / amount;
@@ -254,7 +250,7 @@ int writeImage(const string& filename, int width, int height, const vector<Color
     }
 
     // IN PLACE SCALAR MULTIPLICATION
-    Vector3& Vector3::operator*(const float amount){
+    Vector3& Vector3::operator*(const double amount){
         _a *= amount;
         _b *= amount;
         _c *= amount;
@@ -272,7 +268,7 @@ int writeImage(const string& filename, int width, int height, const vector<Color
     }
 
     // IN PLACE SCALAR DIVISION
-    Vector3& Vector3::operator/(const float amount){
+    Vector3& Vector3::operator/(const double amount){
         _a /= amount;
         _b /= amount;
         _c /= amount;
@@ -303,20 +299,6 @@ int writeImage(const string& filename, int width, int height, const vector<Color
 
     #pragma region ===== FUNCTIONS =====
 
-    const double Vector3::dot() const {
-
-        double res = _a * _a + _b * _b + _c * _c;
-
-        return res;
-    }
-
-    const double Vector3::dot(double scalar) const {
-
-        double res = _a * scalar + _b * scalar + _c * scalar;
-
-        return res;
-    }
-
     const double Vector3::dot(const Vector3& other) const{
 
         double res = _a * other._a + _b * other._b + _c * other._c;
@@ -343,7 +325,7 @@ int writeImage(const string& filename, int width, int height, const vector<Color
 
     const double Vector3::lengthSquared() const{
 
-        double res = dot();
+        double res = dot(*this);
 
         return res;
     }
@@ -450,19 +432,6 @@ int writeImage(const string& filename, int width, int height, const vector<Color
 
     #pragma region ===== FUNCTIONS =====
 
-    const double Direction::dot() const {
-
-        double res = myVect.dot();
-
-        return res;
-    }
-
-    const double Direction::dot(double scalar) const {
-
-        double res = myVect.dot(scalar);
-
-        return res;
-    }
 
     const double Direction::dot(const Direction& other) const {
 
