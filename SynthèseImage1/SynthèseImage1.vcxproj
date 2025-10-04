@@ -123,9 +123,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SyntheseImage1.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Raytrace.cpp" />
+    <ClCompile Include="SyntheseImage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Raytrace.h" />
     <ClInclude Include="SyntheseImage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

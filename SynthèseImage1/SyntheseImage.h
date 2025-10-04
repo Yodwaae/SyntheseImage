@@ -1,7 +1,8 @@
+#pragma once
 #include <iostream>
 
-// TEMP : Added anticipated class declaration to simplify things for the moment
-class Direction; // TODO Might need to have multiple header and cpp files in the future, for clarity sake
+// TODO : To move to different header and cpp files instead of using forward declaration
+class Direction;
 class Point;
 class NormalizedDirection;
 class Color;
