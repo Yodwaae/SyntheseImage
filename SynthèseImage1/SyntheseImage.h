@@ -81,9 +81,35 @@ class Vector3 {
 };
 
 
+template <typename T>
+class Vector3CRTP {
+
+	private:
+
+		Vector3 _vect;
+
+	public:
+
+		#pragma region ===== CONSTRUCTORS =====
+
+		Vector3CRTP();
+		Vector3CRTP(double scal);
+		Vector3CRTP(const Vector3 vec);
+		Vector3CRTP(double x, double y, double z);
+
+		#pragma endregion
+
+		#pragma region ===== FUNCTIONS =====
+
+		// TODO Might need to add a getter for each members (_a, _b, _c) in the future
+		//const Vector3& getVect() const { return _vect; }
+
+		#pragma endregion
+
+};
+
 // NOTE : For all classes, the Vect3 will be stored as value and not pointer as it is a lightweight object, simpler and safer
 // Also no need for copy constructor as in that case the compiler created one will work just fine
-
 class Point {
 
     private:
