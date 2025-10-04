@@ -117,7 +117,7 @@ using namespace std;
     }
 
     // IN PLACE MULTIPLICATION
-    Vector3& Vector3::operator*(const Vector3& other){
+    Vector3& Vector3::operator*=(const Vector3& other){
         _a *= other._a;
         _b *= other._b;
         _c *= other._c;
@@ -126,7 +126,7 @@ using namespace std;
     }
 
     // IN PLACE SCALAR MULTIPLICATION
-    Vector3& Vector3::operator*(const double amount){
+    Vector3& Vector3::operator*=(const double amount){
         _a *= amount;
         _b *= amount;
         _c *= amount;
@@ -135,7 +135,7 @@ using namespace std;
     }
 
     // IN PLACE DIVISION
-    Vector3& Vector3::operator/(const Vector3& other){
+    Vector3& Vector3::operator/=(const Vector3& other){
         _a /= other._a;
         _b /= other._b;
         _c /= other._c;
@@ -144,7 +144,7 @@ using namespace std;
     }
 
     // IN PLACE SCALAR DIVISION
-    Vector3& Vector3::operator/(const double amount){
+    Vector3& Vector3::operator/=(const double amount){
         _a /= amount;
         _b /= amount;
         _c /= amount;
@@ -159,7 +159,7 @@ using namespace std;
     // EQUAL COMPARISON
     bool Vector3::operator==(const Vector3& other) const {
             
-        if (_a == other._a && _b == other._b && _c == other._c)
+        if (abs(_a - other._a) < ESPILON && abs(_b - other._b) < ESPILON && abs(_c - other._c) < ESPILON)
             return true;
 
         return false;
@@ -175,14 +175,14 @@ using namespace std;
 
     #pragma region ===== FUNCTIONS =====
 
-    const double Vector3::dot(const Vector3& other) const{
+    double Vector3::dot(const Vector3& other) const{
 
         double res = _a * other._a + _b * other._b + _c * other._c;
 
         return res;
     }
 
-    const double Vector3::unsafeIndex(int i) const{
+    double Vector3::unsafeIndex(int i) const{
         switch (i)
         {
         case 0: return _a;
@@ -192,21 +192,21 @@ using namespace std;
         }
     }
 
-    const double Vector3::length() const{
+    double Vector3::length() const{
 
         double res =  sqrt(lengthSquared());
 
         return res;
     }
 
-    const double Vector3::lengthSquared() const{
+    double Vector3::lengthSquared() const{
 
         double res = dot(*this);
 
         return res;
     }
 
-    const bool Vector3::isZero() const{
+    bool Vector3::isZero() const{
 
         // Not the best implementation, should I allow a small delta to consider the value is 0 ?
         if (_a == 0 && _b == 0 && _c == 0)
@@ -225,52 +225,53 @@ using namespace std;
     #pragma region ===== CONSTRUCTORS =====
 
     // Default
-    Point::Point() {
-        myVect = Vector3::Vector3();
-    }
+    Point::Point():
+    _vect(){}
 
     // From scalar
-    Point::Point(double scal) {
-        myVect = Vector3::Vector3(scal);
-    }
+    Point::Point(double scal):
+    _vect(scal){}
 
     // From Vec3
-    Point::Point(Vector3 vec) {
-        myVect = Vector3(vec);
-    }
+    Point::Point(Vector3 vec):
+    _vect(vec){}
 
     // Explicit
-    Point::Point(double x, double y, double z) {
-        myVect = Vector3(x, y, z);
-    }
+    Point::Point(double x, double y, double z):
+    _vect(x, y, z){}
 
     #pragma endregion
 
     #pragma region ===== OPERATORS =====
 
-    // TODO Mark those function as const 
-
     // POINT + DIRECTION
     Point Point::operator+(const Direction& other) const{
-        Vector3 res = myVect + other.getVect();
+        Vector3 res = _vect + other.getVect();
 
         return Point(res);
     }
 
     // POINT - DIRECTION
     Point Point::operator-(const Direction& other) const{
-        Vector3 res = myVect - other.getVect();
+        Vector3 res = _vect - other.getVect();
 
         return Point(res);
     }
 
     #pragma endregion
 
-    #pragma region ===== OPERATORS =====
+    #pragma region ===== FUNCTIONS =====
     
+    // DIRECTION TO
+    Direction Point::DirectionTo(const Point& other) const {
+        Direction res = other._vect - _vect;
+
+        return res;
+    }
+
     // DISTANCE TO
-    Direction Point::DistanceTo(const Point& other) const {
-        Direction res = other.myVect - myVect;
+    double Point::DistanceTo(const Point& other) const {
+        double res = (other._vect - _vect).length();
 
         return res;
     }
@@ -285,24 +286,20 @@ using namespace std;
     #pragma region ===== CONSTRUCTORS =====
 
     // Default
-    Direction::Direction() {
-        myVect = Vector3::Vector3();
-    }
+    Direction::Direction():
+    _vect(){}
 
     // From scalar
-    Direction::Direction(double scal) {
-        myVect = Vector3::Vector3(scal);
-    }
+    Direction::Direction(double scal):
+    _vect(scal){}
 
     // From Vec3
-    Direction::Direction(Vector3 vec) {
-        myVect = Vector3(vec);
-    }
+    Direction::Direction(Vector3 vec):
+    _vect(vec){}
 
     // Explicit
-    Direction::Direction(double x, double y, double z) {
-        myVect = Vector3(x, y, z);
-    }
+    Direction::Direction(double x, double y, double z):
+    _vect(x, y, z){}
 
     #pragma endregion
 
@@ -311,7 +308,7 @@ using namespace std;
 
     const double Direction::dot(const Direction& other) const {
 
-        double res = myVect.dot(other.myVect);
+        double res = _vect.dot(other._vect);
 
         return res;
     }
@@ -326,24 +323,20 @@ using namespace std;
     #pragma region ===== CONSTRUCTORS =====
 
     // Default
-    NormalisedDirection::NormalisedDirection() {
-        myVect = Vector3::Vector3();
-    }
+    NormalisedDirection::NormalisedDirection():
+    _vect(){}
 
     // From scalar
-    NormalisedDirection::NormalisedDirection(double scal) {
-        myVect = Vector3::Vector3(scal);
-    }
+    NormalisedDirection::NormalisedDirection(double scal):
+    _vect(scal){}
 
     // From Vec3
-    NormalisedDirection::NormalisedDirection(Vector3 vec) {
-        myVect = Vector3(vec);
-    }
+    NormalisedDirection::NormalisedDirection(Vector3 vec):
+    _vect(vec){}
 
     // Explicit
-    NormalisedDirection::NormalisedDirection(double x, double y, double z) {
-        myVect = Vector3(x, y, z);
-    }
+    NormalisedDirection::NormalisedDirection(double x, double y, double z):
+    _vect(x, y, z){}
 
     #pragma endregion
 
@@ -356,24 +349,20 @@ using namespace std;
     #pragma region ===== CONSTRUCTORS =====
 
     // Default
-    Color::Color() {
-        myVect = Vector3::Vector3();
-    }
+    Color::Color():
+    _vect(){}
 
     // From scalar
-    Color::Color(double scal) {
-        myVect = Vector3::Vector3(scal);
-    }
+    Color::Color(double scal):
+    _vect(scal){}
 
     // From Vec3
-    Color::Color(Vector3 vec) {
-        myVect = Vector3(vec);
-    }
+    Color::Color(Vector3 vec):
+    _vect(vec){}
 
     // Explicit
-    Color::Color(double x, double y, double z) {
-        myVect = Vector3(x, y, z);
-    }
+    Color::Color(double x, double y, double z):
+    _vect(x, y, z){}
 
     #pragma endregion
 
@@ -386,24 +375,20 @@ using namespace std;
     #pragma region ===== CONSTRUCTORS =====
 
     // Default
-    SurfaceAbsorption::SurfaceAbsorption() {
-        myVect = Vector3::Vector3();
-    }
+    SurfaceAbsorption::SurfaceAbsorption():
+    _vect(){}
 
     // From scalar
-    SurfaceAbsorption::SurfaceAbsorption(double scal) {
-        myVect = Vector3::Vector3(scal);
-    }
+    SurfaceAbsorption::SurfaceAbsorption(double scal):
+    _vect(scal){}
 
     // From Vec3
-    SurfaceAbsorption::SurfaceAbsorption(Vector3 vec) {
-        myVect = Vector3(vec);
-    }
+    SurfaceAbsorption::SurfaceAbsorption(Vector3 vec):
+    _vect(vec){}
 
     // Explicit
-    SurfaceAbsorption::SurfaceAbsorption(double x, double y, double z) {
-        myVect = Vector3(x, y, z);
-    }
+    SurfaceAbsorption::SurfaceAbsorption(double x, double y, double z):
+    _vect(x, y, z){}
 
     #pragma endregion
 
@@ -413,7 +398,7 @@ using namespace std;
 
 //class NormalizedDirection {
 //    private:
-//        Vector3 myVect;
+//        Vector3 _vect;
 //
 //    public:
 //
@@ -430,13 +415,13 @@ using namespace std;
 //            if (z > 0) normZ = 1;
 //            else if (z < 0) normZ = -1;
 //
-//            myVect = Vector3(normX, normY, normZ);
+//            _vect = Vector3(normX, normY, normZ);
 //                
 //        }
 //
 //        Vector3 operator+(const NormalizedDirection& other) {
 //            
-//            Vector3 res = myVect + other.myVect;
+//            Vector3 res = _vect + other._vect;
 //
 //            return res;
 //        }
@@ -445,7 +430,7 @@ using namespace std;
 //
 //class Color {
 //    private:
-//        Vector3 myVect;
+//        Vector3 _vect;
 //
 //    public:
 //
@@ -463,7 +448,7 @@ using namespace std;
 //            if (colZ > 255) colZ = 255;
 //            else if (colZ < 0) colZ = 0;
 //
-//            myVect = Vector3(colX, colY, colZ);
+//            _vect = Vector3(colX, colY, colZ);
 //
 //        }
 //
@@ -471,7 +456,7 @@ using namespace std;
 //
 //class SurfaceAbsorptionProperties {
 //    private:
-//        Vector3 myVect;
+//        Vector3 _vect;
 //
 //    public:
 //        SurfaceAbsorptionProperties(double x, double y, double z) {
@@ -489,7 +474,7 @@ using namespace std;
 //            if (z > 1) normZ = 1;
 //            else if (z < 0) normZ = 0;
 //
-//            myVect = Vector3(normX, normY, normZ);
+//            _vect = Vector3(normX, normY, normZ);
 //
 //        }
 //

@@ -13,6 +13,7 @@ class Vector3 {
 	private :
 
 		double _a, _b, _c;
+		static constexpr double ESPILON = 1e-9; // Might later be moved elsewhere
 
 	public:
 
@@ -46,12 +47,12 @@ class Vector3 {
 
 		Vector3& operator+=(const Vector3& other);
 		Vector3& operator-=(const Vector3& other);
-		Vector3& operator*(const Vector3& other);
-		Vector3& operator/(const Vector3& other);
+		Vector3& operator*=(const Vector3& other);
+		Vector3& operator/=(const Vector3& other);
 
 		// SCALAR
-		Vector3& operator*(const double amount);
-		Vector3& operator/(const double amount);
+		Vector3& operator*=(const double amount);
+		Vector3& operator/=(const double amount);
 
 		#pragma endregion
 
@@ -64,15 +65,15 @@ class Vector3 {
 
 		#pragma region ===== FUNCTIONS =====
 
-		const double dot(const Vector3& other) const;
-		const double unsafeIndex(int i) const;
-		const double length() const;
-		const double lengthSquared() const;
-		const bool isZero() const;
+		double dot(const Vector3& other) const;
+		double unsafeIndex(int i) const;
+		double length() const;
+		double lengthSquared() const;
+		bool isZero() const;
 
-		const double getA() const { return _a; }
-		const double getB() const { return _b; }
-		const double getC() const { return _c; }
+		double getA() const { return _a; }
+		double getB() const { return _b; }
+		double getC() const { return _c; }
 
 
 		#pragma endregion
@@ -87,7 +88,7 @@ class Point {
 
     private:
 
-        Vector3 myVect;
+        Vector3 _vect;
 
     public:
 
@@ -95,7 +96,7 @@ class Point {
 
 		Point();
 		Point(double scal);
-		Point(Vector3 vec);
+		Point(const Vector3 vec);
 		Point(double x, double y, double z);
 
 		#pragma endregion
@@ -110,7 +111,8 @@ class Point {
 
 		#pragma region ===== FUNCTIONS =====
 
-		Direction DistanceTo(const Point& other) const;
+		Direction DirectionTo(const Point& other) const;
+		double DistanceTo(const Point& other) const;
 
 		#pragma endregion
 
@@ -120,7 +122,7 @@ class Direction {
 
     private:
 
-        Vector3 myVect;
+        Vector3 _vect;
 
 	public:
 
@@ -128,14 +130,14 @@ class Direction {
 
 		Direction();
 		Direction(double scal);
-		Direction(Vector3 vec);
+		Direction(const Vector3 vec);
 		Direction(double r, double g, double b);
 
 		#pragma endregion
 
 		#pragma region ===== FUNCTIONS =====
 
-		const Vector3& getVect() const { return myVect;}
+		const Vector3& getVect() const { return _vect;}
 		const double dot(const Direction& other) const;
 
 		#pragma endregion
@@ -145,7 +147,7 @@ class Direction {
 class NormalisedDirection {
 
 	private:
-		Vector3 myVect;
+		Vector3 _vect;
 
 	public:
 
@@ -153,7 +155,7 @@ class NormalisedDirection {
 
 		NormalisedDirection();
 		NormalisedDirection(double scal);
-		NormalisedDirection(Vector3 vec);
+		NormalisedDirection(const Vector3 vec);
 		NormalisedDirection(double r, double g, double b);
 
 		#pragma endregion
@@ -163,7 +165,7 @@ class NormalisedDirection {
 class Color {
 
 	private:
-		Vector3 myVect;
+		Vector3 _vect;
 
 	public:
 
@@ -171,16 +173,16 @@ class Color {
 
 		Color();
 		Color(double scal);
-		Color(Vector3 vec);
+		Color(const Vector3 vec);
 		Color(double r, double g, double b);
 
 		#pragma endregion
 
 		#pragma region ===== FUNCTIONS =====
 
-		const double getRed() const { return myVect.getA(); }
-		const double getGreen() const { return myVect.getB(); }
-		const double getBlue() const{ return myVect.getC(); }
+		const double getRed() const { return _vect.getA(); }
+		const double getGreen() const { return _vect.getB(); }
+		const double getBlue() const{ return _vect.getC(); }
 
 		#pragma endregion
 
@@ -189,7 +191,7 @@ class Color {
 class SurfaceAbsorption {
 
 	private:
-		Vector3 myVect;
+		Vector3 _vect;
 
 	public:
 
@@ -197,7 +199,7 @@ class SurfaceAbsorption {
 
 		SurfaceAbsorption();
 		SurfaceAbsorption(double scal);
-		SurfaceAbsorption(Vector3 vec);
+		SurfaceAbsorption(const Vector3 vec);
 		SurfaceAbsorption(double r, double g, double b);
 
 		#pragma endregion

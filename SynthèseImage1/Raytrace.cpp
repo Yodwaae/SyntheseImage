@@ -10,16 +10,15 @@ using namespace std;
 
 double rayIntersectSphere(Ray ray, Sphere sphere) {
 
-    // Initialisation
+    // Shorthand
     double radius = sphere.radius;
     Point center = sphere.center;
     Point origin = ray.origin;
     Direction direction = ray.direction;
-
-
-    Direction oc = origin.DistanceTo(center);
+    
+    //Initialisation
+    Direction oc = origin.DirectionTo(center);
     double r2 = radius * radius;
-
 
     // Setting the 3 terms of que equation system
     double a = direction.dot(direction);
@@ -31,6 +30,12 @@ double rayIntersectSphere(Ray ray, Sphere sphere) {
     double t0 = (-b - sqrt(delta)) / (2 * a);
     double t1 = (-b + sqrt(delta)) / (2 * a);
 
+    /* The return logic is :
+        - delta is < 0, there's no solution to the system return -1 to signify it (no intersection)
+        - else it means there at least one solution to the system, in that case :
+            * return the smallest t that is > 0 (t0 will always be smaller than t1 so we start by that one)
+            * else return 0 (intersection was behind the camera)
+    */
     if (delta < 0)
         return -1;
     else if (t0 >= 0)
@@ -46,8 +51,8 @@ vector<Color> computeSphereIntersect(Sphere sphere, size_t WIDTH, size_t HEIGHT)
     // Initialising color vector<>
     vector<Color> colVec(WIDTH * HEIGHT);
 
-    for (int x = 0; x < 500; x++) {
-        for (int y = 0; y < 500; y++) {
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
 
             // Computing the intersect
             Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
@@ -70,6 +75,7 @@ int writeImage(const string& filename, int width, int height, const vector<Color
     // Creating file
     ofstream out(filename);
 
+    // TODO : To replace with a true error throw
     if (!out) {
         cerr << "Can't create output file !";
         return -1;
