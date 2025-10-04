@@ -220,52 +220,8 @@ using namespace std;
 #pragma endregion
 
 
-#pragma region ========== VECTOR3CRTP ==========
-
-    // Default
-    template <typename T>
-    Vector3CRTP<T>::Vector3CRTP():
-    _vect() {}
-
-    // From Scalar
-    template <typename T>
-    Vector3CRTP<T>::Vector3CRTP(double scal):
-    _vect(scal){}
-
-    // From Vec3
-    template <typename T>
-    Vector3CRTP<T>::Vector3CRTP(const Vector3 vec) :
-    _vect(vec) {}
-
-    // Explicit
-    template <typename T>
-    Vector3CRTP<T>::Vector3CRTP(double x, double y, double z):
-    _vect(x, y, z) {}
-
-#pragma endregion
-
 
 #pragma region ========== POINT CLASS ==========
-
-    #pragma region ===== CONSTRUCTORS =====
-
-    // Default
-    Point::Point():
-    _vect(){}
-
-    // From scalar
-    Point::Point(double scal):
-    _vect(scal){}
-
-    // From Vec3
-    Point::Point(Vector3 vec):
-    _vect(vec){}
-
-    // Explicit
-    Point::Point(double x, double y, double z):
-    _vect(x, y, z){}
-
-    #pragma endregion
 
     #pragma region ===== OPERATORS =====
 

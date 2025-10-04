@@ -84,25 +84,32 @@ class Vector3 {
 template <typename T>
 class Vector3CRTP {
 
-	private:
+	protected:
 
 		Vector3 _vect;
 
 	public:
-
+	
 		#pragma region ===== CONSTRUCTORS =====
 
-		Vector3CRTP();
-		Vector3CRTP(double scal);
-		Vector3CRTP(const Vector3 vec);
-		Vector3CRTP(double x, double y, double z);
+		// Default
+		Vector3CRTP(): _vect() {}
+
+		// From Scalar
+		Vector3CRTP(double scal): _vect(scal) {}
+
+		// From Vec3
+		Vector3CRTP(const Vector3 vec): _vect(vec) {}
+
+		 // Explicit
+		Vector3CRTP(double x, double y, double z): _vect(x, y, z) {}
 
 		#pragma endregion
 
 		#pragma region ===== FUNCTIONS =====
 
 		// TODO Might need to add a getter for each members (_a, _b, _c) in the future
-		//const Vector3& getVect() const { return _vect; }
+		const Vector3& getVect() const { return _vect; }
 
 		#pragma endregion
 
@@ -110,23 +117,12 @@ class Vector3CRTP {
 
 // NOTE : For all classes, the Vect3 will be stored as value and not pointer as it is a lightweight object, simpler and safer
 // Also no need for copy constructor as in that case the compiler created one will work just fine
-class Point {
-
-    private:
-
-        Vector3 _vect;
+class Point : public Vector3CRTP<Point> {
 
     public:
 
-		#pragma region ===== CONSTRUCTORS =====
+		using Vector3CRTP<Point>::Vector3CRTP;
 
-		Point();
-		Point(double scal);
-		Point(const Vector3 vec);
-		Point(double x, double y, double z);
-
-		#pragma endregion
-		
 		#pragma region ===== OPERATORS =====
 
 		Point operator+(const Direction& other) const;
