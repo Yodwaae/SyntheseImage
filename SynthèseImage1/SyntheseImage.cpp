@@ -286,6 +286,18 @@ using namespace std;
 
 #pragma region ========== COLOR CLASS ==========
 
+    #pragma region ===== FUNCTIONS =====
+
+    // Color clamping between 0 and 255
+    // TODO Use the std clamp function from <algorithm> instead
+    double Color::Clamp(const double scal) {
+
+        if (scal > 255) return 255;
+        else if (scal < 0) return 0;
+        else return scal;
+    }
+
+    #pragma endregion
 
 #pragma endregion
 
