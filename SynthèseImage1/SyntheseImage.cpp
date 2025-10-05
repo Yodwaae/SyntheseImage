@@ -220,7 +220,6 @@ using namespace std;
 #pragma endregion
 
 
-
 #pragma region ========== POINT CLASS ==========
 
     #pragma region ===== OPERATORS =====
@@ -264,26 +263,6 @@ using namespace std;
 
 #pragma region ========== DIRECTION CLASS ==========
 
-    #pragma region ===== CONSTRUCTORS =====
-
-    // Default
-    Direction::Direction():
-    _vect(){}
-
-    // From scalar
-    Direction::Direction(double scal):
-    _vect(scal){}
-
-    // From Vec3
-    Direction::Direction(Vector3 vec):
-    _vect(vec){}
-
-    // Explicit
-    Direction::Direction(double x, double y, double z):
-    _vect(x, y, z){}
-
-    #pragma endregion
-
     #pragma region ===== FUNCTIONS =====
 
 
@@ -301,77 +280,17 @@ using namespace std;
 
 #pragma region ========== NORMALISED DIRECTION CLASS ==========
 
-    #pragma region ===== CONSTRUCTORS =====
-
-    // Default
-    NormalisedDirection::NormalisedDirection():
-    _vect(){}
-
-    // From scalar
-    NormalisedDirection::NormalisedDirection(double scal):
-    _vect(scal){}
-
-    // From Vec3
-    NormalisedDirection::NormalisedDirection(Vector3 vec):
-    _vect(vec){}
-
-    // Explicit
-    NormalisedDirection::NormalisedDirection(double x, double y, double z):
-    _vect(x, y, z){}
-
-    #pragma endregion
-
 
 #pragma endregion
 
 
 #pragma region ========== COLOR CLASS ==========
 
-    #pragma region ===== CONSTRUCTORS =====
-
-    // Default
-    Color::Color():
-    _vect(){}
-
-    // From scalar
-    Color::Color(double scal):
-    _vect(scal){}
-
-    // From Vec3
-    Color::Color(Vector3 vec):
-    _vect(vec){}
-
-    // Explicit
-    Color::Color(double x, double y, double z):
-    _vect(x, y, z){}
-
-    #pragma endregion
-
 
 #pragma endregion
 
 
 #pragma region ========== SURFACE ABSORBTION CLASS ==========
-
-    #pragma region ===== CONSTRUCTORS =====
-
-    // Default
-    SurfaceAbsorption::SurfaceAbsorption():
-    _vect(){}
-
-    // From scalar
-    SurfaceAbsorption::SurfaceAbsorption(double scal):
-    _vect(scal){}
-
-    // From Vec3
-    SurfaceAbsorption::SurfaceAbsorption(Vector3 vec):
-    _vect(vec){}
-
-    // Explicit
-    SurfaceAbsorption::SurfaceAbsorption(double x, double y, double z):
-    _vect(x, y, z){}
-
-    #pragma endregion
 
 
 #pragma endregion

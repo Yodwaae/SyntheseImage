@@ -140,65 +140,33 @@ class Point : public Vector3CRTP<Point> {
 
 };
 
-class Direction {
+class Direction : public Vector3CRTP<Direction> {
 
-    private:
+	public :
 
-        Vector3 _vect;
-
-	public:
-
-		#pragma region ===== CONSTRUCTORS =====
-
-		Direction();
-		Direction(double scal);
-		Direction(const Vector3 vec);
-		Direction(double r, double g, double b);
-
-		#pragma endregion
+		using Vector3CRTP<Direction>::Vector3CRTP;
 
 		#pragma region ===== FUNCTIONS =====
 
-		const Vector3& getVect() const { return _vect;}
 		const double dot(const Direction& other) const;
 
 		#pragma endregion
 
 };
 
-class NormalisedDirection {
-
-	private:
-		Vector3 _vect;
+class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 
 	public:
 
-		#pragma region ===== CONSTRUCTORS =====
-
-		NormalisedDirection();
-		NormalisedDirection(double scal);
-		NormalisedDirection(const Vector3 vec);
-		NormalisedDirection(double r, double g, double b);
-
-		#pragma endregion
+		using Vector3CRTP<NormalisedDirection>::Vector3CRTP;
 
 };
 
-class Color {
+class Color : public Vector3CRTP<Color> {
 
-	private:
-		Vector3 _vect;
+	public :
 
-	public:
-
-		#pragma region ===== CONSTRUCTORS =====
-
-		Color();
-		Color(double scal);
-		Color(const Vector3 vec);
-		Color(double r, double g, double b);
-
-		#pragma endregion
+		using Vector3CRTP<Color>::Vector3CRTP;
 
 		#pragma region ===== FUNCTIONS =====
 
@@ -210,20 +178,8 @@ class Color {
 
 };
 
-class SurfaceAbsorption {
-
-	private:
-		Vector3 _vect;
-
+class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
+	
 	public:
-
-		#pragma region ===== CONSTRUCTORS =====
-
-		SurfaceAbsorption();
-		SurfaceAbsorption(double scal);
-		SurfaceAbsorption(const Vector3 vec);
-		SurfaceAbsorption(double r, double g, double b);
-
-		#pragma endregion
-
+		using Vector3CRTP<SurfaceAbsorption>::Vector3CRTP;
 };
