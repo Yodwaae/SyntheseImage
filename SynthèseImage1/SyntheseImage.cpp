@@ -280,6 +280,18 @@ using namespace std;
 
 #pragma region ========== NORMALISED DIRECTION CLASS ==========
 
+    #pragma region ===== FUNCTIONS =====
+
+        // Clamp NormalisedDirection to either (-1, 0 or 1)
+        double NormalisedDirection::Clamp(const double scal) {
+
+            if (scal > 0) return 1;
+            else if (scal < 0) return -1;
+            else return 0;
+        }
+
+    #pragma endregion
+
 
 #pragma endregion
 
@@ -304,6 +316,18 @@ using namespace std;
 
 #pragma region ========== SURFACE ABSORBTION CLASS ==========
 
+    #pragma region ===== FUNCTIONS =====
+
+        // Clamping between 0 and 1 (as I don't have min and max value it's not really a normalisation
+        // TODO Use the std clamp function from <algorithm> instead
+        double SurfaceAbsorption::Clamp(const double scal) {
+
+            if (scal > 1) return 1;
+            else if (scal < 0) return 0;
+            else return scal;
+        }
+
+    #pragma endregion
 
 #pragma endregion
 
