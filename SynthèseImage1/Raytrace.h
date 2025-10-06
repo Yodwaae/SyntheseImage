@@ -31,7 +31,7 @@ struct Sphere {
 #pragma region ===== FUNCTIONS =====
 
 double rayIntersectSphere(Ray ray, Sphere sphere);
-vector<Color> computeSphereIntersect(Sphere sphere, size_t WIDTH, size_t HEIGHT);
+vector<Color> computeSpheresIntersect(vector<Sphere> spheres, size_t WIDTH, size_t HEIGHT);
 int writeImage(const string& filename, int width, int height, const vector<Color>& vec);
 
 #pragma endregion

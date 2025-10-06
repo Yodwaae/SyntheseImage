@@ -47,26 +47,34 @@ double rayIntersectSphere(Ray ray, Sphere sphere) {
 
 }
 
-vector<Color> computeSphereIntersect(Sphere sphere, size_t WIDTH, size_t HEIGHT) {
-    // Initialising color vector<>
+vector<Color> computeSpheresIntersect(vector<Sphere> spheres, size_t WIDTH, size_t HEIGHT) {
+    
+    // Initialisation
     vector<Color> colVec(WIDTH * HEIGHT);
-    Sphere sphere2{ Point(0, 250, 300), 100 };
 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
 
-            // Computing the intersect
-            Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
-            double pixel1 = rayIntersectSphere(ray, sphere);
-            double pixel2 = rayIntersectSphere(ray, sphere2);
+            // TODO Clean up that part of the code
 
-            double pixel = max(pixel1, pixel2);
+            // Loop Initialisation
+            Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
+            double nearestDist = INFINITY;
+            
+            for (const Sphere& sphere : spheres) {
+                double intersectionDist = rayIntersectSphere(ray, sphere);
+
+                // Should be -1 if no hit but it's best being cautious and test for <= 0
+                if (intersectionDist > 0 && intersectionDist < nearestDist)
+                    nearestDist = intersectionDist;
+            }
+
 
             // Setting pixel color depending on the result
-            if (pixel < 0)
+            if (nearestDist == INFINITY)
                 colVec[y * WIDTH + x] = Color(255, 0, 0);// Red background
             else
-                colVec[y * WIDTH + x] = Color(pixel); // Sphere
+                colVec[y * WIDTH + x] = Color(nearestDist); // Sphere
 
         }
     }
