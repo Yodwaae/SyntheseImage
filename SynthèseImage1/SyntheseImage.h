@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <algorithm>
 
 // TODO : To move to different header and cpp files instead of using forward declaration
 class Direction;
@@ -176,7 +177,9 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		static double Clamp(const double scal);
+		// TODO Maybe make it constexpr ?
+		// Nested ternaries to set NormalisedDirection to either : 1 if scal > 0, -1 if scal < 0 or else 0
+		static double Clamp(const double scal) { return (scal > 0 ? 1 : (scal < 0 ? -1 : 0)); }
 
 		#pragma endregion
 };
@@ -189,7 +192,8 @@ class Color : public Vector3CRTP<Color> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		static double Clamp(const double scal);
+		// Color clamping between 0 and 255
+		static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0);}
 
 		const double getRed() const { return _vect.getA(); }
 		const double getGreen() const { return _vect.getB(); }
@@ -206,7 +210,8 @@ class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		static double Clamp(const double scal);
+		// Clamping between 0 and 1 (as I don't have min and max value it's not really a normalisation)
+		static double Clamp(const double scal) {return std::clamp(scal, 0.0, 100.0);}
 
 
 		#pragma endregion

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include "SyntheseImage.h"
 #include "Raytrace.h"
 
@@ -282,14 +283,6 @@ using namespace std;
 
     #pragma region ===== FUNCTIONS =====
 
-        // Clamp NormalisedDirection to either (-1, 0 or 1)
-        double NormalisedDirection::Clamp(const double scal) {
-
-            if (scal > 0) return 1;
-            else if (scal < 0) return -1;
-            else return 0;
-        }
-
     #pragma endregion
 
 
@@ -300,14 +293,6 @@ using namespace std;
 
     #pragma region ===== FUNCTIONS =====
 
-    // Color clamping between 0 and 255
-    // TODO Use the std clamp function from <algorithm> instead
-    double Color::Clamp(const double scal) {
-
-        if (scal > 255) return 255;
-        else if (scal < 0) return 0;
-        else return scal;
-    }
 
     #pragma endregion
 
@@ -318,43 +303,14 @@ using namespace std;
 
     #pragma region ===== FUNCTIONS =====
 
-        // Clamping between 0 and 1 (as I don't have min and max value it's not really a normalisation
-        // TODO Use the std clamp function from <algorithm> instead
-        double SurfaceAbsorption::Clamp(const double scal) {
-
-            if (scal > 1) return 1;
-            else if (scal < 0) return 0;
-            else return scal;
-        }
-
+      
     #pragma endregion
 
 #pragma endregion
 
 
 //class NormalizedDirection {
-//    private:
-//        Vector3 _vect;
-//
-//    public:
-//
-//        NormalizedDirection(int x, int y, int z){
-//            int normX, normY, normZ = 0;
-//
-//
-//            if (x > 0) normX = 1;
-//            else if (x < 0) normX = -1;
-//
-//            if (y > 0) normY = 1;
-//            else if (y < 0) normY = -1;
-//
-//            if (z > 0) normZ = 1;
-//            else if (z < 0) normZ = -1;
-//
-//            _vect = Vector3(normX, normY, normZ);
-//                
-//        }
-//
+
 //        Vector3 operator+(const NormalizedDirection& other) {
 //            
 //            Vector3 res = _vect + other._vect;
@@ -364,54 +320,4 @@ using namespace std;
 //
 //};
 //
-//class Color {
-//    private:
-//        Vector3 _vect;
 //
-//    public:
-//
-//        Color(int x, int y, int z) {
-//            int colX = x;
-//            int colY = y;
-//            int colZ = z;
-//
-//            if (colX > 255) colX = 255;
-//            else if (colX < 0) colX = 0;
-//
-//            if (colY > 255) colY = 255;
-//            else if (colY < 0) colY = 0;
-//
-//            if (colZ > 255) colZ = 255;
-//            else if (colZ < 0) colZ = 0;
-//
-//            _vect = Vector3(colX, colY, colZ);
-//
-//        }
-//
-//};
-//
-//class SurfaceAbsorptionProperties {
-//    private:
-//        Vector3 _vect;
-//
-//    public:
-//        SurfaceAbsorptionProperties(double x, double y, double z) {
-//            int normX = x;
-//            int normY = y;
-//            int normZ = z;
-//
-//
-//            if (x > 1) normX = 1;
-//            else if (x < 0) normX = 0;
-//
-//            if (y > 1) normY = 1;
-//            else if (y < 0) normY = 0;
-//
-//            if (z > 1) normZ = 1;
-//            else if (z < 0) normZ = 0;
-//
-//            _vect = Vector3(normX, normY, normZ);
-//
-//        }
-//
-//};

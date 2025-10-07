@@ -14,7 +14,8 @@ int main()
     // Spheres creation
     Sphere sphere1{ Point(250, 250, 300), 200 };
     Sphere sphere2{ Point(0, 250, 300), 100 };
-    vector<Sphere> spheres = { sphere1, sphere2 };
+    Sphere sphere3{ Point(500, 250, 300), 100 };
+    vector<Sphere> spheres = { sphere1, sphere2, sphere3 };
 
     // Image creation
     vector<Color> colVec = computeSpheresIntersect(spheres, WIDTH, HEIGHT);
