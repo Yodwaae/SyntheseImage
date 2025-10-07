@@ -189,7 +189,7 @@ using namespace std;
         case 0: return _a;
         case 1: return _b;
         case 2: return _c;
-        default: throw "Index Out of Range"; //TODO Of course to implement better later
+        default: throw out_of_range("Index " + to_string(i) + "is out of range");
         }
     }
 

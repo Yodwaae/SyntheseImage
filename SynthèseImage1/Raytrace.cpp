@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include <fstream>
 #include <vector>
 #include <cmath>
@@ -55,12 +56,12 @@ vector<Color> computeSpheresIntersect(vector<Sphere> spheres, size_t WIDTH, size
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
 
-            // TODO Clean up that part of the code
-
             // Loop Initialisation
             Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
             double nearestDist = INFINITY;
             
+            // For each pixel try to see if there's an interesct with a sphere
+            // If there's multiple intersections keep the closest hit that is > 0
             for (const Sphere& sphere : spheres) {
                 double intersectionDist = rayIntersectSphere(ray, sphere);
 
@@ -68,14 +69,10 @@ vector<Color> computeSpheresIntersect(vector<Sphere> spheres, size_t WIDTH, size
                 if (intersectionDist > 0 && intersectionDist < nearestDist)
                     nearestDist = intersectionDist;
             }
-
-
-            // Setting pixel color depending on the result
-            if (nearestDist == INFINITY)
-                colVec[y * WIDTH + x] = Color(255, 0, 0);// Red background
-            else
-                colVec[y * WIDTH + x] = Color(nearestDist); // Sphere
-
+            
+            // If no hit set color as background (red) else set color as distance (clamped to 255)
+            colVec[y * WIDTH + x] = (nearestDist == INFINITY) ? Color(255, 0, 0) : Color(nearestDist);
+        
         }
     }
 
@@ -87,10 +84,8 @@ int writeImage(const string& filename, int width, int height, const vector<Color
     // Creating file
     ofstream out(filename);
 
-    // TODO : To replace with a true error throw
     if (!out) {
-        cerr << "Can't create output file !";
-        return -1;
+        throw ios_base::failure("Was unable to create output file : " + filename);
     }
 
     // Writing the PPM Header (Mode, size, color range)
