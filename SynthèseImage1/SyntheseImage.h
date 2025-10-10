@@ -116,7 +116,17 @@ class Vector3CRTP {
 
 		#pragma endregion
 
+		#pragma region ===== OPERATORS =====
+		
+		// TODO Should these function return T instead of Vector3 (idem for all other operators in other class)
+		// TODO Tidy up part of that code
+		Vector3 operator*(const double amount) const { return _vect * amount; }
+
+		#pragma endregion
+
 		#pragma region ===== FUNCTIONS =====
+
+		const double dot(const Vector3CRTP<T>& other) const { return _vect.dot(other._vect); }
 
 		// TODO Might need to add a getter for each members (_a, _b, _c) in the future
 		const Vector3& getVect() const { return _vect; }
@@ -149,6 +159,7 @@ class Point : public Vector3CRTP<Point> {
 		#pragma region ===== FUNCTIONS =====
 
 		Direction DirectionTo(const Point& other) const;
+		NormalisedDirection NormalisedDirectionTo(const Point& other) const;
 		double DistanceTo(const Point& other) const;
 
 		#pragma endregion
@@ -163,7 +174,8 @@ class Direction : public Vector3CRTP<Direction> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		const double dot(const Direction& other) const;
+		// TODO To remove now that vec3 crtp takes care of it
+		//const double dot(const Direction& other) const;
 
 		#pragma endregion
 

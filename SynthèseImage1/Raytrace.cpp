@@ -9,7 +9,7 @@ using namespace std;
 
 #pragma region ===== FUNCTIONS =====
 
-double rayIntersectSphere(Ray ray, Sphere sphere) {
+double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
     // Shorthand
     double radius = sphere.radius;
@@ -48,7 +48,23 @@ double rayIntersectSphere(Ray ray, Sphere sphere) {
 
 }
 
-vector<Color> computeSpheresIntersect(vector<Sphere> spheres, size_t WIDTH, size_t HEIGHT) {
+// TODO In the future directly return a color instead of a double
+double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
+
+    Point x = ray.origin + (ray.direction * intersectDistance);
+
+    NormalisedDirection directionToLight = x.NormalisedDirectionTo(light.position);
+    NormalisedDirection sphereNormal = x.NormalisedDirectionTo(sphere.center);
+
+    // TODO Most likely need an abs value but let's just test without to see
+    double coef = sphereNormal.dot(directionToLight);
+
+    double pixelColor = coef * intersectDistance;
+
+    return pixelColor;
+}
+
+vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, size_t WIDTH, size_t HEIGHT) {
     
     // Initialisation
     vector<Color> colVec(WIDTH * HEIGHT);
@@ -70,8 +86,15 @@ vector<Color> computeSpheresIntersect(vector<Sphere> spheres, size_t WIDTH, size
                     nearestDist = intersectionDist;
             }
             
+
+            // TODO : only temp for test, need to think about how to implement it correctly
+            if (nearestDist == INFINITY)
+                colVec[y * WIDTH + x] = Color(255, 0, 0);
+            else
+                colVec[y * WIDTH + x] = Color(lightIntersectSphere(light, ray, spheres.front(), nearestDist));
+
             // If no hit set color as background (red) else set color as distance (clamped to 255)
-            colVec[y * WIDTH + x] = (nearestDist == INFINITY) ? Color(255, 0, 0) : Color(nearestDist);
+            //colVec[y * WIDTH + x] = (nearestDist == INFINITY) ? Color(255, 0, 0) : Color(nearestDist);
         
         }
     }

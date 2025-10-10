@@ -14,11 +14,13 @@ int main()
     // Spheres creation
     Sphere sphere1{ Point(250, 250, 300), 200 };
     Sphere sphere2{ Point(0, 250, 300), 100 };
-    Sphere sphere3{ Point(500, 250, 300), 100 };
-    vector<Sphere> spheres = { sphere1, sphere2, sphere3 };
+    vector<Sphere> spheres = { sphere1, sphere2 };
+
+    // Light Creation
+    Light light{ Point(255, 0, 255) };
 
     // Image creation
-    vector<Color> colVec = computeSpheresIntersect(spheres, WIDTH, HEIGHT);
+    vector<Color> colVec = computeSpheresIntersect(light, spheres, WIDTH, HEIGHT);
     writeImage("sphere.ppm", WIDTH, HEIGHT, colVec);
 
     return 0;

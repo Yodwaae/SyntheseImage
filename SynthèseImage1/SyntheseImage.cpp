@@ -250,6 +250,15 @@ using namespace std;
         return res;
     }
 
+    // TODO Maybe should leverage  the DirectionTo() function and just normalised the direction ?
+    // Less code duplication though I'm not sure that it would not increase overhead a bit 
+    // NORMALISED DIRECTION TO
+    NormalisedDirection Point::NormalisedDirectionTo(const Point& other) const {
+        NormalisedDirection res = other._vect - _vect;
+
+        return res;
+    }
+
     // DISTANCE TO
     double Point::DistanceTo(const Point& other) const {
         double res = (other._vect - _vect).length();
@@ -266,13 +275,13 @@ using namespace std;
 
     #pragma region ===== FUNCTIONS =====
 
+    // TODO TO remove now that vec3crtp takes care of it
+    //const double Direction::dot(const Direction& other) const {
 
-    const double Direction::dot(const Direction& other) const {
+        //double res = _vect.dot(other._vect);
 
-        double res = _vect.dot(other._vect);
-
-        return res;
-    }
+        //return res;
+    //}
 
     #pragma endregion
 
