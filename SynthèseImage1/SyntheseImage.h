@@ -109,7 +109,7 @@ class Vector3CRTP {
 		Vector3CRTP(double scal): _vect(T::Clamp(scal)) {}
 
 		// From Vec3
-		Vector3CRTP(const Vector3 vec): _vect(Clamp(vec)) {}
+		Vector3CRTP(const Vector3& vec): _vect(Clamp(vec)) {}
 
 		 // Explicit
 		Vector3CRTP(double x, double y, double z): _vect(Clamp(x, y, z)) {}
@@ -128,8 +128,11 @@ class Vector3CRTP {
 
 		const double dot(const Vector3CRTP<T>& other) const { return _vect.dot(other._vect); }
 
-		// TODO Might need to add a getter for each members (_a, _b, _c) in the future
+		// NOTE : Do not create overhead as they are inlined by the compiler
 		const Vector3& getVect() const { return _vect; }
+		const double getA() const { return _vect.getA(); }
+		const double getB() const { return _vect.getB(); }
+		const double getC() const { return _vect.getC(); }
 
 		// Chain the clamp functions so the derived class only as to redefine the double one
 		static double Clamp(const double scal) { return scal; }
@@ -174,9 +177,6 @@ class Direction : public Vector3CRTP<Direction> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		// TODO To remove now that vec3 crtp takes care of it
-		//const double dot(const Direction& other) const;
-
 		#pragma endregion
 
 };
@@ -187,11 +187,17 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 
 		using Vector3CRTP<NormalisedDirection>::Vector3CRTP;
 
+		NormalisedDirection(const Vector3& vec)
+			: Vector3CRTP<NormalisedDirection>(Clamp(vec)) {}
+
 		#pragma region ===== FUNCTIONS =====
 
-		// TODO Maybe make it constexpr ?
-		// Nested ternaries to set NormalisedDirection to either : 1 if scal > 0, -1 if scal < 0 or else 0
-		static double Clamp(const double scal) { return (scal > 0 ? 1 : (scal < 0 ? -1 : 0)); }
+		// TODO Comment this function, move it to cpp instead of header ?
+		static Vector3 Clamp(const Vector3& vec) {
+			double len = vec.length();
+			if (len < 1e-9) return Vector3(0, 0, 0);
+			return vec / len;
+		}
 
 		#pragma endregion
 };
@@ -207,9 +213,9 @@ class Color : public Vector3CRTP<Color> {
 		// Color clamping between 0 and 255
 		static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0);}
 
-		const double getRed() const { return _vect.getA(); }
-		const double getGreen() const { return _vect.getB(); }
-		const double getBlue() const{ return _vect.getC(); }
+		const double getRed() const { return getA(); }
+		const double getGreen() const { return getB(); }
+		const double getBlue() const{ return getC(); }
 
 		#pragma endregion
 

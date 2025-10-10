@@ -9,6 +9,8 @@ using namespace std;
 
 #pragma region ===== FUNCTIONS =====
 
+// TODO Refacto and improve the way the function chain each other, where some part of the logic are
+
 double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
     // Shorthand
@@ -49,6 +51,7 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 }
 
 // TODO In the future directly return a color instead of a double
+// + do the comments
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
     Point x = ray.origin + (ray.direction * intersectDistance);
@@ -56,10 +59,8 @@ double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sp
     NormalisedDirection directionToLight = x.NormalisedDirectionTo(light.position);
     NormalisedDirection sphereNormal = x.NormalisedDirectionTo(sphere.center);
 
-    // TODO Most likely need an abs value but let's just test without to see
-    double coef = sphereNormal.dot(directionToLight);
-
-    double pixelColor = coef * intersectDistance;
+    double coef = abs(sphereNormal.dot(directionToLight));
+    double pixelColor = coef * 255;
 
     return pixelColor;
 }
