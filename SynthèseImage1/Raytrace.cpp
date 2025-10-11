@@ -50,19 +50,23 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
 }
 
-// TODO Right now return a white intensity but in the future should just return intensity that will be aplied to a color (the color part is not this function responsibility)
+
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
     // Initialisation
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
     NormalisedDirection directionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
-    NormalisedDirection sphereNormal = intersectionPoint.NormalisedDirectionTo(sphere.center);
+    NormalisedDirection sphereNormal = sphere.center.NormalisedDirectionTo(intersectionPoint);
 
     // Cosine of angle between light and normal
-    double lightIntensity = abs(sphereNormal.dot(directionToLight));
+    double lightIntensity = sphereNormal.dot(directionToLight);
 
     return lightIntensity;
 }
+
+// TODO Clean up the implementation : - lightIntersect only on the final "dist" but with the correct sphere
+// - Remove color management from the function, it should just adjust the intensity and color be managed by the sphere
+// - In the future shouldn't have to worry about a placeholder background color as we will build a cornell box, but in case could had an optionnal arg for background color just in case
 
 vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, size_t WIDTH, size_t HEIGHT) {
     
