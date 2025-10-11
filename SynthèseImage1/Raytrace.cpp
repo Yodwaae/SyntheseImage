@@ -76,6 +76,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
             // Loop Initialisation
             Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
             double nearestDist = INFINITY;
+            Color pixelColor = Color(255, 0, 0);
             
             // For each pixel try to see if there's an interesct with a sphere
             // If there's multiple intersections keep the closest hit that is > 0
@@ -83,19 +84,16 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
                 double intersectionDist = rayIntersectSphere(ray, sphere);
 
                 // Should be -1 if no hit but it's best being cautious and test for <= 0
-                if (intersectionDist > 0 && intersectionDist < nearestDist)
+                if (intersectionDist > 0 && intersectionDist < nearestDist) {
                     nearestDist = intersectionDist;
+
+                    // TODO Better implementation but still not optimal as it does the light intersection even with pixel that will be overwritten just after
+                    pixelColor = Color(lightIntersectSphere(light, ray, sphere, nearestDist));
+                }
             }
             
-
-            // TODO : only temp for test, need to think about how to implement it correctly
-            if (nearestDist == INFINITY)
-                colVec[y * WIDTH + x] = Color(255, 0, 0);
-            else
-                colVec[y * WIDTH + x] = Color(lightIntersectSphere(light, ray, spheres.front(), nearestDist));
-
-            // If no hit set color as background (red) else set color as distance (clamped to 255)
-            //colVec[y * WIDTH + x] = (nearestDist == INFINITY) ? Color(255, 0, 0) : Color(nearestDist);
+            // Set the Color
+            colVec[y * WIDTH + x] = pixelColor;
         
         }
     }
