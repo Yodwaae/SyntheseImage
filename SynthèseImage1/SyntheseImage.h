@@ -3,18 +3,20 @@
 #include <algorithm>
 
 // TODO : To move to different header and cpp files instead of using forward declaration
+// TODO : Also decide whether in class I organise things by access (public/private) then by type (variable/functions) or the other way around
 class Direction;
 class Point;
 class NormalisedDirection;
 class Color;
 class SurfaceAbsorption;
 
+static constexpr double EPSILON = 1e-9;
+
 class Vector3 {
 
 	private :
 
 		double _a, _b, _c;
-		static constexpr double ESPILON = 1e-9; // Might later be moved elsewhere
 
 	public:
 
@@ -192,10 +194,12 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		// TODO Comment this function, move it to cpp instead of header ?
+		/* Normalizes 'vec' so its length becomes 1
+		* If 'vec' is nearly zero-length, returns (0, 0, 0) instead
+		* to avoid division by zero */
 		static Vector3 Clamp(const Vector3& vec) {
 			double len = vec.length();
-			if (len < 1e-9) return Vector3(0, 0, 0);
+			if (len < EPSILON) return Vector3(0, 0, 0);
 			return vec / len;
 		}
 
@@ -210,12 +214,13 @@ class Color : public Vector3CRTP<Color> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		// Color clamping between 0 and 255
-		static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0);}
-
+		// Getters
 		const double getRed() const { return getA(); }
 		const double getGreen() const { return getB(); }
 		const double getBlue() const{ return getC(); }
+
+		// Color clamping between 0 and 255
+		static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
 
 		#pragma endregion
 
@@ -228,7 +233,7 @@ class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		// Clamping between 0 and 1 (as I don't have min and max value it's not really a normalisation)
+		// Clamping between 0 and 100 (as I don't have min and max value it's not really a normalisation)
 		static double Clamp(const double scal) {return std::clamp(scal, 0.0, 100.0);}
 
 

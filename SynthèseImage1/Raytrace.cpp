@@ -50,19 +50,18 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
 }
 
-// TODO In the future directly return a color instead of a double
-// + do the comments
+// TODO Right now return a white intensity but in the future should just return intensity that will be aplied to a color (the color part is not this function responsibility)
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
-    Point x = ray.origin + (ray.direction * intersectDistance);
+    // Initialisation
+    Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
+    NormalisedDirection directionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
+    NormalisedDirection sphereNormal = intersectionPoint.NormalisedDirectionTo(sphere.center);
 
-    NormalisedDirection directionToLight = x.NormalisedDirectionTo(light.position);
-    NormalisedDirection sphereNormal = x.NormalisedDirectionTo(sphere.center);
+    // Cosine of angle between light and normal
+    double lightIntensity = abs(sphereNormal.dot(directionToLight));
 
-    double coef = abs(sphereNormal.dot(directionToLight));
-    double pixelColor = coef * 255;
-
-    return pixelColor;
+    return lightIntensity;
 }
 
 vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, size_t WIDTH, size_t HEIGHT) {
@@ -88,7 +87,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
                     nearestDist = intersectionDist;
 
                     // TODO Better implementation but still not optimal as it does the light intersection even with pixel that will be overwritten just after
-                    pixelColor = Color(lightIntersectSphere(light, ray, sphere, nearestDist));
+                    pixelColor = Color(lightIntersectSphere(light, ray, sphere, nearestDist) * 255);
                 }
             }
             

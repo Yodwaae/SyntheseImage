@@ -160,7 +160,7 @@ using namespace std;
     // EQUAL COMPARISON
     bool Vector3::operator==(const Vector3& other) const {
             
-        if (abs(_a - other._a) < ESPILON && abs(_b - other._b) < ESPILON && abs(_c - other._c) < ESPILON)
+        if (abs(_a - other._a) < EPSILON && abs(_b - other._b) < EPSILON && abs(_c - other._c) < EPSILON)
             return true;
 
         return false;
