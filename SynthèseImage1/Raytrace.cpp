@@ -91,7 +91,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
                     nearestDist = intersectionDist;
 
                     // TODO Better implementation but still not optimal as it does the light intersection even with pixel that will be overwritten just after
-                    pixelColor = Color(lightIntersectSphere(light, ray, sphere, nearestDist) * 255);
+                    pixelColor = Color(sphere.color * lightIntersectSphere(light, ray, sphere, nearestDist));
                 }
             }
             

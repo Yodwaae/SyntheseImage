@@ -22,6 +22,7 @@ struct Sphere {
     public:
         Point center;
         double radius;
+        Color color;
 
 };
 

@@ -4,6 +4,7 @@
 
 // TODO : To move to different header and cpp files instead of using forward declaration
 // TODO : Also decide whether in class I organise things by access (public/private) then by type (variable/functions) or the other way around
+// TODO : I really need to fix this problem of operators only working one way around
 class Direction;
 class Point;
 class NormalisedDirection;
