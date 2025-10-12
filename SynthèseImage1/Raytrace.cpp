@@ -10,6 +10,7 @@ using namespace std;
 #pragma region ===== FUNCTIONS =====
 
 // TODO Refacto and improve the way the function chain each other, where some part of the logic are
+// TODO Create a RayIntersect Object (should it wrap or replace rayIntersectSphere ?)
 
 double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
@@ -17,7 +18,7 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
     double radius = sphere.radius;
     Point center = sphere.center;
     Point origin = ray.origin;
-    Direction direction = ray.direction;
+    Direction direction = ray.direction.ToDirection();
     
     //Initialisation
     Direction oc = origin.DirectionTo(center);
@@ -50,16 +51,18 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
 }
 
-
+// TODO Redo the comments + fix bug that create dark spot at the most lit area
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
     // Initialisation
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
-    NormalisedDirection directionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
+    NormalisedDirection normalisedDirectionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
+    Direction directionToLight = intersectionPoint.DirectionTo(light.position);
     NormalisedDirection sphereNormal = sphere.center.NormalisedDirectionTo(intersectionPoint);
+    double lightDistanceSquared = directionToLight.dot(directionToLight);
 
     // Cosine of angle between light and normal
-    double lightIntensity = sphereNormal.dot(directionToLight);
+    double lightIntensity = sphereNormal.dot(normalisedDirectionToLight) / lightDistanceSquared * light.power;
 
     return lightIntensity;
 }
@@ -72,14 +75,23 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
     
     // Initialisation
     vector<Color> colVec(WIDTH * HEIGHT);
+    double openingCoef = 1.001; //TODO openingCoef should have a better name and be a func arg
 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
 
             // Loop Initialisation
-            Ray ray{ Point(x, y , 0), Direction(0, 0, 1) };
+
+            // TODO Obviously there a big work of refactoring to do here
+            Point pNearPlane = Point(x, y, 0);
+            Point pNearPlanePrime = Point(x - 250, y - 250, 0);
+            Point pFarPlane = Point((x - 250) * openingCoef, (y - 250) * openingCoef, 1);
+            NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
+
+            Ray ray{ pNearPlane, planeDistance };
             double nearestDist = INFINITY;
             Color pixelColor = Color(255, 0, 0);
+
             
             // For each pixel try to see if there's an interesct with a sphere
             // If there's multiple intersections keep the closest hit that is > 0

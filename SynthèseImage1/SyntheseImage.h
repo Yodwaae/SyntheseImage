@@ -204,6 +204,9 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 			return vec / len;
 		}
 
+		// TODO Bandage fix need to rethink how to do manage Direction and NormalisedDirection
+		Direction ToDirection() const { return Direction(_vect); }
+
 		#pragma endregion
 };
 
@@ -234,6 +237,7 @@ class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
 
 		#pragma region ===== FUNCTIONS =====
 
+		// TODO Finally I might reclamp that from 0 to 1 as it might be clearer
 		// Clamping between 0 and 100 (as I don't have min and max value it's not really a normalisation)
 		static double Clamp(const double scal) {return std::clamp(scal, 0.0, 100.0);}
 

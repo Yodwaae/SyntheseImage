@@ -7,13 +7,18 @@
 
 using namespace std;
 
+
+// TODO : Wrap Sphere into a struct Object
+// Object will handle the color and surfaceAbsorbtion/Reflection (maybe collapse that in a Material)
+// Although good to note that color is no longer necessary as the three channel reflection will create the color, need to think about that
+
 #pragma region ===== STRUCTURES =====
 
 struct Ray {
 
     public:
         Point origin;
-        Direction direction;
+        NormalisedDirection direction;
 
 };
 
@@ -30,6 +35,7 @@ struct Light {
 
     public:
         Point position;
+        double power; // TODO To see if I do a proper tonemap, if Light has a color or just a vec3 for power (but that would need a new class, etc ...)
 };
 
 #pragma endregion
