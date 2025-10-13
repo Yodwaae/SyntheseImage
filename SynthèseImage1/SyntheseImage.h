@@ -2,16 +2,32 @@
 #include <iostream>
 #include <algorithm>
 
-// TODO : To move to different header and cpp files instead of using forward declaration
+// NOTE : For all classes, the Vect3 will be stored as value and not pointer as it is a lightweight object, simpler and safer
+// Also no need for copy constructor as in that case the compiler created one will work just fine
+
 // TODO : Also decide whether in class I organise things by access (public/private) then by type (variable/functions) or the other way around
 // TODO : I really need to fix this problem of operators only working one way around
+// TODO : The clamp chain/logic isn't working at all
+
+#pragma region ===== FORWARD DECLARATIONS =====
+
 class Direction;
 class Point;
 class NormalisedDirection;
 class Color;
 class SurfaceAbsorption;
 
+#pragma endregion
+
+
+#pragma region ===== GLOBALS =====
+
 static constexpr double EPSILON = 1e-9;
+
+#pragma endregion
+
+
+#pragma region ===== CLASSES =====
 
 class Vector3 {
 
@@ -32,7 +48,7 @@ class Vector3 {
 			// From Scalar
 			Vector3(double scal);
 
-			// Explicit (TODO : Deprecated ?)
+			// Explicit (NOTE :Shouldn't be used anymore but for the moment I keep it as it can be used during debug/temp integration of a feature
 			Vector3(double x, double y, double z);
 
 		#pragma endregion
@@ -103,7 +119,6 @@ class Vector3CRTP {
 		#pragma region ===== CONSTRUCTORS =====
 		// Note : Using a static polyphormism hook to allow classes like Color to clamp the value
 		// Also defining a default clamp because some classes (Point & Direction) won't define one
-		// TODO The Explicit constructor of the Vector3 class might have become useless
 
 		// Default
 		Vector3CRTP(): _vect() {}
@@ -121,9 +136,8 @@ class Vector3CRTP {
 
 		#pragma region ===== OPERATORS =====
 		
-		// TODO Should these function return T instead of Vector3 (idem for all other operators in other class)
-		// TODO Tidy up part of that code
-		Vector3 operator*(const double amount) const { return _vect * amount; }
+		// NOTE : Stay vigilant about the T return, should be safer but could cause error wuth the way the logic is implemented
+		T operator*(const double amount) const { return T(_vect * amount); } // OWOPERATOR
 
 		#pragma endregion
 
@@ -146,8 +160,6 @@ class Vector3CRTP {
 
 };
 
-// NOTE : For all classes, the Vect3 will be stored as value and not pointer as it is a lightweight object, simpler and safer
-// Also no need for copy constructor as in that case the compiler created one will work just fine
 class Point : public Vector3CRTP<Point> {
 
     public:
@@ -156,8 +168,8 @@ class Point : public Vector3CRTP<Point> {
 
 		#pragma region ===== OPERATORS =====
 
-		Point operator+(const Direction& other) const;
-		Point operator-(const Direction& other) const;
+		Point operator+(const Direction& other) const; // OWOPERATOR
+		Point operator-(const Direction& other) const; // OWOPERATOR
 
 		#pragma endregion
 
@@ -189,7 +201,6 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 	public:
 
 		using Vector3CRTP<NormalisedDirection>::Vector3CRTP;
-
 		NormalisedDirection(const Vector3& vec)
 			: Vector3CRTP<NormalisedDirection>(Clamp(vec)) {}
 
@@ -215,6 +226,8 @@ class Color : public Vector3CRTP<Color> {
 	public :
 
 		using Vector3CRTP<Color>::Vector3CRTP;
+		Color(const Vector3& vec)
+			: Vector3CRTP<Color>(Clamp(vec)) {}
 
 		#pragma region ===== FUNCTIONS =====
 
@@ -225,6 +238,7 @@ class Color : public Vector3CRTP<Color> {
 
 		// Color clamping between 0 and 255
 		static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
+		static Vector3 Clamp(const Vector3& vec) { return Vector3(Clamp(vec.getA()), Clamp(vec.getB()), Clamp(vec.getC())); } // TODO TEMP FIX
 
 		#pragma endregion
 
@@ -237,11 +251,11 @@ class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		// TODO Finally I might reclamp that from 0 to 1 as it might be clearer
-		// Clamping between 0 and 100 (as I don't have min and max value it's not really a normalisation)
-		static double Clamp(const double scal) {return std::clamp(scal, 0.0, 100.0);}
-
+		// Clamping between 0 and 1 to have an absorption coef
+		static double Clamp(const double scal) {return std::clamp(scal, 0.0, 1.0);}
 
 		#pragma endregion
 
 };
+
+#pragma endregion

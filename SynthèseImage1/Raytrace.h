@@ -47,7 +47,7 @@ struct Light {
 
 double rayIntersectSphere(const Ray& ray, const Sphere& sphere);
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance);
-vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, size_t WIDTH, size_t HEIGHT);
+vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, size_t WIDTH, size_t HEIGHT);
 
 #pragma endregion
 

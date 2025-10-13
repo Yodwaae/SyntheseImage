@@ -51,11 +51,11 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
 }
 
-// TODO Redo the comments + fix bug that create dark spot at the most lit area
+// TODO Refacto + Redo the comments
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
     // Initialisation
-    Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
+    Point intersectionPoint = ray.origin + (ray.direction.ToDirection() * intersectDistance);
     NormalisedDirection normalisedDirectionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
     Direction directionToLight = intersectionPoint.DirectionTo(light.position);
     NormalisedDirection sphereNormal = sphere.center.NormalisedDirectionTo(intersectionPoint);
@@ -71,11 +71,10 @@ double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sp
 // - Remove color management from the function, it should just adjust the intensity and color be managed by the sphere
 // - In the future shouldn't have to worry about a placeholder background color as we will build a cornell box, but in case could had an optionnal arg for background color just in case
 
-vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, size_t WIDTH, size_t HEIGHT) {
+vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, size_t WIDTH, size_t HEIGHT) {
     
     // Initialisation
     vector<Color> colVec(WIDTH * HEIGHT);
-    double openingCoef = 1.001; //TODO openingCoef should have a better name and be a func arg
 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
@@ -85,7 +84,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
             // TODO Obviously there a big work of refactoring to do here
             Point pNearPlane = Point(x, y, 0);
             Point pNearPlanePrime = Point(x - 250, y - 250, 0);
-            Point pFarPlane = Point((x - 250) * openingCoef, (y - 250) * openingCoef, 1);
+            Point pFarPlane = Point((x - 250) * cameraOpening, (y - 250) * cameraOpening, 1);
             NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
 
             Ray ray{ pNearPlane, planeDistance };

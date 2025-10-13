@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-    // TODO Obviously everything is hardcoded right now as it just debugging and testing
+    // NOTE Obviously everything is hardcoded right now as it just debugging and testing
 
     // Constants def
     constexpr size_t WIDTH = 500;
@@ -32,7 +32,7 @@ int main()
     Light light{ Point(250, 250, 0), 50000};
 
     // Image creation
-    vector<Color> colVec = computeSpheresIntersect(light, spheres, WIDTH, HEIGHT);
+    vector<Color> colVec = computeSpheresIntersect(light, spheres, 1.001, WIDTH, HEIGHT);
     writeImage("sphere.ppm", WIDTH, HEIGHT, colVec);
 
     return 0;
