@@ -124,18 +124,19 @@ class Vector3CRTP {
 		Vector3CRTP(): _vect() {}
 
 		// From Scalar
-		Vector3CRTP(double scal): _vect(scal) {}
+		Vector3CRTP(double scal): _vect(T::Clamp(scal)) {}
 
 		// From Vec3
-		Vector3CRTP(const Vector3& vec): _vect(vec) {}
+		Vector3CRTP(const Vector3& vec) : _vect(T::Clamp(vec)) {}
 
 		 // Explicit
-		Vector3CRTP(double x, double y, double z): _vect(x, y, z) {}
+		Vector3CRTP(double x, double y, double z): _vect(T::Clamp(x, y, z)) {}
 
 		#pragma endregion
 
 		#pragma region ===== OPERATORS =====
 		
+		// TODO Might need to ensure the operators also clamp the result, to see
 		// NOTE : Stay vigilant about the T return, should be safer but could cause error wuth the way the logic is implemented
 		T operator*(const double amount) const { return T(_vect * amount); } // OWOPERATOR
 
@@ -144,11 +145,6 @@ class Vector3CRTP {
 		#pragma region ===== FUNCTIONS =====
 
 		const double dot(const Vector3CRTP<T>& other) const { return _vect.dot(other._vect); }
-
-
-		// TODO Temporary solution, still not that SOLID but at least it works
-		static Vector3 Clamp(const Vector3& vec) { return Vector3(T::Clamp(vec.getA()), T::Clamp(vec.getB()),T::Clamp(vec.getC())); }
-		static Vector3 Clamp(double x, double y, double z) { return Vector3(T::Clamp(x), T::Clamp(y), T::Clamp(z)); }
 
 
 		// NOTE : Do not create overhead as they are inlined by the compiler
@@ -176,10 +172,9 @@ class Point : public Vector3CRTP<Point> {
 
 
 		#pragma region ===== FUNCTIONS =====
-
-
-		// Chain the clamp functions so the derived class only as to redefine the double one
 		static double Clamp(const double scal) { return scal; }
+		static Vector3 Clamp(const Vector3& vec) { return vec; }
+		static Vector3 Clamp(double x, double y, double z) { return Vector3(x, y, z); }
 
 		Direction DirectionTo(const Point& other) const;
 		NormalisedDirection NormalisedDirectionTo(const Point& other) const;
@@ -199,6 +194,8 @@ class Direction : public Vector3CRTP<Direction> {
 
 		// Chain the clamp functions so the derived class only as to redefine the double one
 		static double Clamp(const double scal) { return scal; }
+		static Vector3 Clamp(const Vector3& vec) { return vec; }
+		static Vector3 Clamp(double x, double y, double z) { return Vector3(x, y , z); }
 
 		#pragma endregion
 
@@ -209,8 +206,6 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 	public:
 
 		using Vector3CRTP<NormalisedDirection>::Vector3CRTP;
-		NormalisedDirection(const Vector3& vec)
-			: Vector3CRTP<NormalisedDirection>(Clamp(vec)) {}
 
 		#pragma region ===== FUNCTIONS =====
 
@@ -222,6 +217,8 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 			if (len < EPSILON) return Vector3(0.0, 0.0, 0.0);
 			return vec / len;
 		}
+		static double Clamp(const double scal) { Clamp(Vector3(scal, scal, scal)); }
+		static Vector3 Clamp(double x, double y, double z) { Clamp(Vector3(x, y, z)); }
 
 		// TODO Bandage fix need to rethink how to do manage Direction and NormalisedDirection
 		Direction ToDirection() const { return Direction(_vect); }
@@ -234,9 +231,6 @@ class Color : public Vector3CRTP<Color> {
 	public :
 
 		using Vector3CRTP<Color>::Vector3CRTP;
-		Color(const Vector3& vec)
-			: Vector3CRTP<Color>(Clamp(vec)) {}
-
 
 		#pragma region ===== FUNCTIONS =====
 
@@ -247,7 +241,8 @@ class Color : public Vector3CRTP<Color> {
 
 		// Color clamping between 0 and 255
 		static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
-		static Vector3 Clamp(const Vector3& vec) { return Vector3(Clamp(vec.getA()), Clamp(vec.getB()), Clamp(vec.getC())); } // TODO TEMP FIX
+		static Vector3 Clamp(const Vector3& vec) { return Vector3(Clamp(vec.getA()), Clamp(vec.getB()), Clamp(vec.getC())); }
+		static Vector3 Clamp(double x, double y, double z) { return Vector3(Clamp(x), Clamp(y), Clamp(z)); }
 
 		#pragma endregion
 
@@ -262,6 +257,9 @@ class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
 
 		// Clamping between 0 and 1 to have an absorption coef
 		static double Clamp(const double scal) {return std::clamp(scal, 0.0, 1.0);}
+		static Vector3 Clamp(const Vector3& vec) { return Vector3(Clamp(vec.getA()), Clamp(vec.getB()), Clamp(vec.getC())); }
+		static Vector3 Clamp(double x, double y, double z) { return Vector3(Clamp(x), Clamp(y), Clamp(z)); }
+
 
 		#pragma endregion
 
