@@ -124,13 +124,13 @@ class Vector3CRTP {
 		Vector3CRTP(): _vect() {}
 
 		// From Scalar
-		Vector3CRTP(double scal): _vect(T::Clamp(scal)) {}
+		Vector3CRTP(double scal): _vect(scal) {}
 
 		// From Vec3
-		Vector3CRTP(const Vector3& vec): _vect(Clamp(vec)) {}
+		Vector3CRTP(const Vector3& vec): _vect(vec) {}
 
 		 // Explicit
-		Vector3CRTP(double x, double y, double z): _vect(Clamp(x, y, z)) {}
+		Vector3CRTP(double x, double y, double z): _vect(x, y, z) {}
 
 		#pragma endregion
 
@@ -145,16 +145,17 @@ class Vector3CRTP {
 
 		const double dot(const Vector3CRTP<T>& other) const { return _vect.dot(other._vect); }
 
+
+		// TODO Temporary solution, still not that SOLID but at least it works
+		static Vector3 Clamp(const Vector3& vec) { return Vector3(T::Clamp(vec.getA()), T::Clamp(vec.getB()),T::Clamp(vec.getC())); }
+		static Vector3 Clamp(double x, double y, double z) { return Vector3(T::Clamp(x), T::Clamp(y), T::Clamp(z)); }
+
+
 		// NOTE : Do not create overhead as they are inlined by the compiler
 		const Vector3& getVect() const { return _vect; }
 		const double getA() const { return _vect.getA(); }
 		const double getB() const { return _vect.getB(); }
 		const double getC() const { return _vect.getC(); }
-
-		// Chain the clamp functions so the derived class only as to redefine the double one
-		static double Clamp(const double scal) { return scal; }
-		static Vector3 Clamp(const Vector3& vec) { return Vector3(Clamp(vec.getA()), Clamp(vec.getB()), Clamp(vec.getC())); }
-		static Vector3 Clamp(double x, double y, double z) { return Vector3(Clamp(x), Clamp(y), Clamp(z)); }
 
 		#pragma endregion
 
@@ -176,6 +177,10 @@ class Point : public Vector3CRTP<Point> {
 
 		#pragma region ===== FUNCTIONS =====
 
+
+		// Chain the clamp functions so the derived class only as to redefine the double one
+		static double Clamp(const double scal) { return scal; }
+
 		Direction DirectionTo(const Point& other) const;
 		NormalisedDirection NormalisedDirectionTo(const Point& other) const;
 		double DistanceTo(const Point& other) const;
@@ -191,6 +196,9 @@ class Direction : public Vector3CRTP<Direction> {
 		using Vector3CRTP<Direction>::Vector3CRTP;
 
 		#pragma region ===== FUNCTIONS =====
+
+		// Chain the clamp functions so the derived class only as to redefine the double one
+		static double Clamp(const double scal) { return scal; }
 
 		#pragma endregion
 
@@ -211,7 +219,7 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 		* to avoid division by zero */
 		static Vector3 Clamp(const Vector3& vec) {
 			double len = vec.length();
-			if (len < EPSILON) return Vector3(0, 0, 0);
+			if (len < EPSILON) return Vector3(0.0, 0.0, 0.0);
 			return vec / len;
 		}
 
@@ -228,6 +236,7 @@ class Color : public Vector3CRTP<Color> {
 		using Vector3CRTP<Color>::Vector3CRTP;
 		Color(const Vector3& vec)
 			: Vector3CRTP<Color>(Clamp(vec)) {}
+
 
 		#pragma region ===== FUNCTIONS =====
 
