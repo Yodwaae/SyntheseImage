@@ -24,12 +24,13 @@ int main()
     // Spheres creation
     Sphere sphere1{ Point(150, 350, 250), 80, Color(0, 0, 255) };
     Sphere sphere2{ Point(350, 350, 250), 80, Color(255, 0, 255) };
+    Sphere sphere3{ Point(250, 270, 410), 80, Color(255, 255, 0) };
 
     // Sphere vector
-    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2 };
+    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2, sphere3 };
 
     // Light creation
-    Light light{ Point(250, 250, 0), 50000};
+    Light light{ Point(250, 250, 0), 100000};
 
     // Image creation
     vector<Color> colVec = computeSpheresIntersect(light, spheres, 1.001, WIDTH, HEIGHT);

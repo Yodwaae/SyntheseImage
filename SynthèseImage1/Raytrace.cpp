@@ -81,7 +81,8 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
 
             // Loop Initialisation
 
-            // TODO Obviously there a big work of refactoring to do here
+            // TODO Obviously there a big work of refactoring to do here 
+            // Either I assume a sphere will always be hit or by default assume the first sphere is hit
             Point pNearPlane = Point(x, y, 0);
             Point pNearPlanePrime = Point(x - 250, y - 250, 0);
             Point pFarPlane = Point((x - 250) * cameraOpening, (y - 250) * cameraOpening, 1);
@@ -90,7 +91,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
             Ray ray{ pNearPlane, planeDistance };
             double nearestDist = INFINITY;
             Color pixelColor = Color(255, 0, 0);
-            Sphere intersectedSphere;
+            Sphere intersectedSphere = spheres[0];
 
             
             // For each pixel try to see if there's an interesct with a sphere
@@ -102,12 +103,11 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
                 if (intersectionDist > 0 && intersectionDist < nearestDist) {
                     nearestDist = intersectionDist;
                     intersectedSphere = sphere;
-
                 }
             }
             
-            pixelColor = Color(intersectedSphere.color * lightIntersectSphere(light, ray, intersectedSphere, nearestDist));
             // Set the Color
+            pixelColor = Color(intersectedSphere.color * lightIntersectSphere(light, ray, intersectedSphere, nearestDist));
             colVec[y * WIDTH + x] = pixelColor;
         
         }
