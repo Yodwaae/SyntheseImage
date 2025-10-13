@@ -7,7 +7,7 @@
 
 // TODO : Also decide whether in class I organise things by access (public/private) then by type (variable/functions) or the other way around
 // TODO : I really need to fix this problem of operators only working one way around
-// TODO : The clamp chain/logic isn't working at all
+
 
 #pragma region ===== FORWARD DECLARATIONS =====
 
@@ -209,6 +209,8 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 
 		#pragma region ===== FUNCTIONS =====
 
+		static double Clamp(const double scal) { Clamp(Vector3(scal, scal, scal)); }
+		static Vector3 Clamp(double x, double y, double z) { Clamp(Vector3(x, y, z)); }
 		/* Normalizes 'vec' so its length becomes 1
 		* If 'vec' is nearly zero-length, returns (0, 0, 0) instead
 		* to avoid division by zero */
@@ -217,8 +219,7 @@ class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
 			if (len < EPSILON) return Vector3(0.0, 0.0, 0.0);
 			return vec / len;
 		}
-		static double Clamp(const double scal) { Clamp(Vector3(scal, scal, scal)); }
-		static Vector3 Clamp(double x, double y, double z) { Clamp(Vector3(x, y, z)); }
+
 
 		// TODO Bandage fix need to rethink how to do manage Direction and NormalisedDirection
 		Direction ToDirection() const { return Direction(_vect); }
