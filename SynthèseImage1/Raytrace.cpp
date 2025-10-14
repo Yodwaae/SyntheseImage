@@ -51,20 +51,17 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
 }
 
-// TODO Refacto + Redo the comments
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
-    // 
+    // Initialisation (values for cosine and attenuation)
     Point intersectionPoint = ray.origin + (ray.direction.ToDirection() * intersectDistance);
     NormalisedDirection normalisedDirectionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
     NormalisedDirection sphereNormal = sphere.center.NormalisedDirectionTo(intersectionPoint);
-    
-    //
     Direction directionToLight = intersectionPoint.DirectionTo(light.position);
     double lightDistanceSquared = directionToLight.dot(directionToLight);
 
     // Compute cosine of angle between surface normal and light direction
-    double lightAngle = sphereNormal.dot(normalisedDirectionToLight) ;
+    double lightAngle = sphereNormal.dot(normalisedDirectionToLight);
 
     // Compute attenuation (inverse-square law) and final light intensity
     double attenuation = light.power /lightDistanceSquared;
