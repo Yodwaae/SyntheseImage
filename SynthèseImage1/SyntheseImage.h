@@ -135,7 +135,6 @@ class Vector3CRTP {
 
 		#pragma region ===== OPERATORS =====
 		
-		// TODO Might need to ensure the operators also clamp the result, to see
 		// NOTE : Stay vigilant about the T return, should be safer but could cause error wuth the way the logic is implemented
 		T operator*(const double amount) const { return T(_vect * amount); }
 

@@ -54,22 +54,27 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 // TODO Refacto + Redo the comments
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
-    // Initialisation
+    // 
     Point intersectionPoint = ray.origin + (ray.direction.ToDirection() * intersectDistance);
     NormalisedDirection normalisedDirectionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
-    Direction directionToLight = intersectionPoint.DirectionTo(light.position);
     NormalisedDirection sphereNormal = sphere.center.NormalisedDirectionTo(intersectionPoint);
+    
+    //
+    Direction directionToLight = intersectionPoint.DirectionTo(light.position);
     double lightDistanceSquared = directionToLight.dot(directionToLight);
 
-    // Cosine of angle between light and normal
-    double lightIntensity = sphereNormal.dot(normalisedDirectionToLight) / lightDistanceSquared * light.power;
+    // Compute cosine of angle between surface normal and light direction
+    double lightAngle = sphereNormal.dot(normalisedDirectionToLight) ;
+
+    // Compute attenuation (inverse-square law) and final light intensity
+    double attenuation = light.power /lightDistanceSquared;
+    double lightIntensity = lightAngle * attenuation;
 
     return lightIntensity;
 }
 
-// TODO Clean up the implementation : - lightIntersect only on the final "dist" but with the correct sphere
-// - Remove color management from the function, it should just adjust the intensity and color be managed by the sphere
-// - In the future shouldn't have to worry about a placeholder background color as we will build a cornell box, but in case could had an optionnal arg for background color just in case
+// TODO Clean up the implementation : - Remove color management from the function, it should just adjust the intensity and color be managed by the sphere
+// - In the future shouldn't have to worry about a placeholder background color as we will build a cornell box, but in case could add an optionnal arg for background color just in case
 
 vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, size_t WIDTH, size_t HEIGHT) {
     
