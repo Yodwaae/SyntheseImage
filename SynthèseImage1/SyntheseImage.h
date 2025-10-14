@@ -4,12 +4,11 @@
 
 // NOTE : For all classes, the Vect3 will be stored as value and not pointer as it is a lightweight object, simpler and safer
 // Also no need for copy constructor as in that case the compiler created one will work just fine
+// NOTE : Commutative operator that impact two differents classes also have a function to reverse the expression allowing the operator to work both ways
 
 // TODO : Also decide whether in class I organise things by access (public/private) then by type (variable/functions) or the other way around
-// TODO : I really need to fix this problem of operators only working one way around
 
-
-#pragma region ===== FORWARD DECLARATIONS =====
+#pragma region ========== FORWARD DECLARATIONS ==========
 
 class Direction;
 class Point;
@@ -20,14 +19,14 @@ class SurfaceAbsorption;
 #pragma endregion
 
 
-#pragma region ===== GLOBALS =====
+#pragma region ========== GLOBALS ==========
 
 static constexpr double EPSILON = 1e-9;
 
 #pragma endregion
 
 
-#pragma region ===== CLASSES =====
+#pragma region ========== CLASSES ==========
 
 class Vector3 {
 
@@ -138,7 +137,7 @@ class Vector3CRTP {
 		
 		// TODO Might need to ensure the operators also clamp the result, to see
 		// NOTE : Stay vigilant about the T return, should be safer but could cause error wuth the way the logic is implemented
-		T operator*(const double amount) const { return T(_vect * amount); } // OWOPERATOR
+		T operator*(const double amount) const { return T(_vect * amount); }
 
 		#pragma endregion
 
@@ -165,8 +164,8 @@ class Point : public Vector3CRTP<Point> {
 
 		#pragma region ===== OPERATORS =====
 
-		Point operator+(const Direction& other) const; // OWOPERATOR
-		Point operator-(const Direction& other) const; // OWOPERATOR
+		Point operator+(const Direction& other) const;
+		Point operator-(const Direction& other) const; 
 
 		#pragma endregion
 
@@ -265,5 +264,21 @@ class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
 		#pragma endregion
 
 };
+
+#pragma endregion
+
+
+#pragma region =========== NON-MEMBER OPERATORS ==========
+
+// DIRECTION + POINT
+inline Point operator+(const Direction& dir, const Point& point) {
+	return point + dir;
+}
+
+// VECTOR3CRTP<T> * SCALAR
+template <typename T>
+inline Vector3CRTP<T> operator*(double scalar, const Vector3CRTP<T>& t) {
+	return t * scalar;
+}
 
 #pragma endregion
