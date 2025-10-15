@@ -19,11 +19,11 @@ struct Material {
 
     public:
         Color color;
-        SurfaceAbsorption surfaceAbsorption;
+        Albedo albedo;
 
         Color displayedColor(double lightIntensity) {
 
-            Color res = color * surfaceAbsorption * lightIntensity;
+            Color res = color * albedo * lightIntensity;
 
             return res;
         }

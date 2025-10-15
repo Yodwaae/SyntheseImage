@@ -14,7 +14,7 @@ class Direction;
 class Point;
 class NormalisedDirection;
 class Color;
-class SurfaceAbsorption;
+class Albedo;
 
 #pragma endregion
 
@@ -247,17 +247,17 @@ class Color : public Vector3CRTP<Color> {
 		#pragma region ===== OPERATORS =====
 
 		// COLOR * SURFACE ABSORPTION
-		Color operator*(const SurfaceAbsorption& surfAb) const;
+		Color operator*(const Albedo& albedo) const;
 
 		#pragma endregion
 
 
 };
 
-class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
+class Albedo : public Vector3CRTP<Albedo> {
 	
 	public:
-		using Vector3CRTP<SurfaceAbsorption>::Vector3CRTP;
+		using Vector3CRTP<Albedo>::Vector3CRTP;
 
 		#pragma region ===== FUNCTIONS =====
 
@@ -288,8 +288,8 @@ inline Point operator+(const Direction& dir, const Point& point) {
 }
 
 // SURFACE ABSORPTION * COLOR
-inline Color operator*(const SurfaceAbsorption& surfAb, const Color& color) {
-	return color * surfAb;
+inline Color operator*(const Albedo& albedo, const Color& color) {
+	return color * albedo;
 }
 
 #pragma endregion

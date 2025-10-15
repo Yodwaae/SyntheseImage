@@ -292,8 +292,8 @@ using namespace std;
 
     #pragma region ===== FUNCTIONS =====
 
-    Color Color::operator*(const SurfaceAbsorption& surfAb) const {
-        Vector3 res = _vect * surfAb.getVect();
+    Color Color::operator*(const Albedo& albedo) const {
+        Vector3 res = _vect * albedo.getVect();
 
         return Color(res);
     }
