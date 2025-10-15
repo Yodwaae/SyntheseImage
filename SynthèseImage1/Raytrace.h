@@ -9,10 +9,26 @@ using namespace std;
 
 
 // TODO : Wrap Sphere into a struct Object
-// Object will handle the color and surfaceAbsorbtion/Reflection (maybe collapse that in a Material)
+// TODO : Add the behavior to the material (metal, glass, ...) + I don't really like that I added a function to the material struct but don't think there's another way (or make material a func)
 // Although good to note that color is no longer necessary as the three channel reflection will create the color, need to think about that
 
 #pragma region ===== STRUCTURES =====
+
+
+struct Material {
+
+    public:
+        Color color;
+        SurfaceAbsorption surfaceAbsorption;
+
+        Color displayedColor(double lightIntensity) {
+
+            Color res = color * surfaceAbsorption * lightIntensity;
+
+            return res;
+        }
+
+};
 
 struct Ray {
 
@@ -27,7 +43,7 @@ struct Sphere {
     public:
         Point center;
         double radius;
-        Color color;
+        Material material;
 
 };
 
@@ -37,6 +53,9 @@ struct Light {
         Point position;
         double power; // TODO To see if I do a proper tonemap, if Light has a color or just a vec3 for power (but that would need a new class, etc ...)
 };
+
+
+
 
 #pragma endregion
 

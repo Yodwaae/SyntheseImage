@@ -109,7 +109,8 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
             }
             
             // Set the Color
-            pixelColor = Color(intersectedSphere.color * lightIntersectSphere(light, ray, intersectedSphere, nearestDist));
+            double lightIntensity = lightIntersectSphere(light, ray, intersectedSphere, nearestDist);
+            pixelColor = Color(intersectedSphere.material.displayedColor(lightIntensity));
             colVec[y * WIDTH + x] = pixelColor;
         
         }

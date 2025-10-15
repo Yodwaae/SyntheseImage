@@ -244,6 +244,14 @@ class Color : public Vector3CRTP<Color> {
 
 		#pragma endregion
 
+		#pragma region ===== OPERATORS =====
+
+		// COLOR * SURFACE ABSORPTION
+		Color operator*(const SurfaceAbsorption& surfAb) const;
+
+		#pragma endregion
+
+
 };
 
 class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
@@ -268,15 +276,20 @@ class SurfaceAbsorption : public Vector3CRTP<SurfaceAbsorption> {
 
 #pragma region =========== NON-MEMBER OPERATORS ==========
 
+// VECTOR3CRTP<T> * SCALAR
+template <typename T>
+inline Vector3CRTP<T> operator*(double scalar, const Vector3CRTP<T>& t) {
+	return t * scalar;
+}
+
 // DIRECTION + POINT
 inline Point operator+(const Direction& dir, const Point& point) {
 	return point + dir;
 }
 
-// VECTOR3CRTP<T> * SCALAR
-template <typename T>
-inline Vector3CRTP<T> operator*(double scalar, const Vector3CRTP<T>& t) {
-	return t * scalar;
+// SURFACE ABSORPTION * COLOR
+inline Color operator*(const SurfaceAbsorption& surfAb, const Color& color) {
+	return color * surfAb;
 }
 
 #pragma endregion
