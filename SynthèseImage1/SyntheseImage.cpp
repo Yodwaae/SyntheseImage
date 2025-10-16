@@ -273,6 +273,12 @@ using namespace std;
 
     #pragma region ===== FUNCTIONS =====
 
+    NormalisedDirection Direction::Normalise() const {
+        NormalisedDirection res = NormalisedDirection(_vect);
+
+        return res;
+    }
+
     #pragma endregion
 
 #pragma endregion
@@ -303,7 +309,7 @@ using namespace std;
 #pragma endregion
 
 
-#pragma region ========== SURFACE ABSORBTION CLASS ==========
+#pragma region ========== ALBEDO ==========
 
     #pragma region ===== FUNCTIONS =====
 

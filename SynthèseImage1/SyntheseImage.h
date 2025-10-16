@@ -195,31 +195,45 @@ class Direction : public Vector3CRTP<Direction> {
 		static Vector3 Clamp(const Vector3& vec) { return vec; }
 		static Vector3 Clamp(double x, double y, double z) { return Vector3(x, y , z); }
 
+		NormalisedDirection Normalise() const;
+
 		#pragma endregion
 
 };
 
-class NormalisedDirection : public Vector3CRTP<NormalisedDirection> {
+// TODO Better than before but there's still problem of code duplication (not much), also might need to redefine operators so operation between normalisedDir send back a normalisedDir (to see if it's useful)
+class NormalisedDirection : public Direction {
 
 	public:
 
-		using Vector3CRTP<NormalisedDirection>::Vector3CRTP;
+		// OPTI If I keep this approach I'll compute the default normalisedDirection at compile time and store it as constexpr
+		// Default, normalise a (1, 1, 1) vector because a (0, 0, 0) can't be normalised as it's length will always be 0
+		NormalisedDirection(): Direction(Normalise(Vector3(1, 1, 1))) {}
+
+		// From Scalar
+		NormalisedDirection(double scal): Direction(Normalise(Vector3(scal, scal, scal))) {}
+
+		// From Vec3
+		NormalisedDirection(const Vector3& vec) : Direction(Normalise(vec)) {}
+
+		// Explicit
+		NormalisedDirection(double x, double y, double z): Direction(Normalise(Vector3(x, y, z))) {}
 
 		#pragma region ===== FUNCTIONS =====
 
 		static double Clamp(const double scal) { return Clamp(Vector3(scal, scal, scal)).getA(); }
 		static Vector3 Clamp(double x, double y, double z) { return Clamp(Vector3(x, y, z)); }
+		static Vector3 Clamp(const Vector3& vec) { return Normalise(vec); }
+
 		/* Normalizes 'vec' so its length becomes 1
 		* If 'vec' is nearly zero-length, returns (0, 0, 0) instead
 		* to avoid division by zero */
-		static Vector3 Clamp(const Vector3& vec) {
+		static Vector3 Normalise(const Vector3& vec) {
+
 			double len = vec.length();
 			if (len < EPSILON) return Vector3(0.0, 0.0, 0.0);
 			return vec / len;
 		}
-
-		// TODO Bandage fix need to rethink how to do manage Direction and NormalisedDirection
-		Direction ToDirection() const { return Direction(_vect); }
 
 		#pragma endregion
 };

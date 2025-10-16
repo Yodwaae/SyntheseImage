@@ -18,7 +18,7 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
     double radius = sphere.radius;
     Point center = sphere.center;
     Point origin = ray.origin;
-    Direction direction = ray.direction.ToDirection();
+    Direction direction = ray.direction;
     
     //Initialisation
     Direction oc = origin.DirectionTo(center);
@@ -54,7 +54,7 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
     // Initialisation (values for cosine and attenuation)
-    Point intersectionPoint = ray.origin + (ray.direction.ToDirection() * intersectDistance);
+    Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
     NormalisedDirection normalisedDirectionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
     NormalisedDirection sphereNormal = sphere.center.NormalisedDirectionTo(intersectionPoint);
     Direction directionToLight = intersectionPoint.DirectionTo(light.position);
