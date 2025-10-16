@@ -21,7 +21,7 @@ struct Material {
         Color color;
         Albedo albedo;
 
-        Color displayedColor(double lightIntensity) {
+        Color displayedColor(double lightIntensity) const {
 
             Color res = color * albedo * lightIntensity;
 

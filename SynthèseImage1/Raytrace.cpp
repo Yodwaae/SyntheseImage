@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+#include <optional>
 #include "Raytrace.h"
 
 using namespace std;
@@ -74,25 +75,25 @@ double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sp
 vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor) {
     
     // Initialisation
-    vector<Color> colVec(WIDTH * HEIGHT * sizeof(Color));
+    vector<Color> colVec(WIDTH * HEIGHT);
+    double verticalOffset = WIDTH / 2;
+    double horizontalOffset = HEIGHT / 2;
 
+    // TODO Obviously there a big work of refactoring to do here 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
 
             // Loop Initialisation
-
-            // TODO Obviously there a big work of refactoring to do here 
-            // Either I assume a sphere will always be hit or by default assume the first sphere is hit
-            Point pNearPlane = Point(x, y, 0);
-            Point pNearPlanePrime = Point(x - WIDTH/2, y - HEIGHT/2, 0);
-            Point pFarPlane = Point((x - WIDTH/2) * cameraOpening, (y - HEIGHT/2) * cameraOpening, 1);
-            NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
-
-            Ray ray{ pNearPlane, planeDistance };
             double nearestDist = INFINITY;
             Color colorValue = backgroundColor;
-            Sphere hitSphere = spheres[0];
+            const Sphere* hitSphere = nullptr;
 
+            // Compute the ray direction for this pixel in camera space
+            Point pNearPlane = Point(x, y, 0);
+            Point pNearPlanePrime = Point(x - verticalOffset, y - horizontalOffset, 0);
+            Point pFarPlane = Point((x - verticalOffset) * cameraOpening, (y - horizontalOffset) * cameraOpening, 1);
+            NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
+            Ray ray{ pNearPlane, planeDistance };
             
             // For each pixel try to see if there's an interesct with a sphere
             // If there's multiple intersections keep the closest hit that is > 0
@@ -102,14 +103,19 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
                 // Should be -1 if no hit but it's best being cautious and test for <= 0
                 if (intersectionDist > 0 && intersectionDist < nearestDist) {
                     nearestDist = intersectionDist;
-                    hitSphere = sphere;
+                    hitSphere = &sphere;
                 }
             }
             
             // Set the Color
-            double lightIntensity = lightIntersectSphere(light, ray, hitSphere, nearestDist);
-            colorValue = hitSphere.material.displayedColor(lightIntensity);
-            colVec[y * WIDTH + x] = colorValue;
+            if (hitSphere) {
+                
+                double lightIntensity = lightIntersectSphere(light, ray, *hitSphere, nearestDist);
+                colorValue = hitSphere->material.displayedColor(lightIntensity);
+                colVec[y * WIDTH + x] = colorValue;
+            }
+            else
+                colVec[y * WIDTH + x] = backgroundColor;
         
         }
     }

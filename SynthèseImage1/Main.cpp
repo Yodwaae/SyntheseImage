@@ -23,11 +23,11 @@ int main()
 
     // Spheres creation
     Sphere sphere1{ Point(150, 350, 250), 80, Material{Color(0, 0, 255), Albedo(1, 1, 1)} };
-    Sphere sphere2{ Point(350, 350, 250), 80, Material{Color(255, 0, 255), Albedo(1, 1, 1)} };
+    Sphere sphere2{ Point(350, 350, 250), 80, Material{Color(255, 255, 255), Albedo(1, 1, 1)} };
     Sphere sphere3{ Point(250, 270, 410), 80, Material{Color(255, 255, 0), Albedo(1, 1, 1)} };
 
     // Sphere vector
-    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2, sphere3 };
+    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, sphere1, sphere2, sphere3 };
 
     // Light creation
     Light light{ Point(250, 250, 0), 100000};
