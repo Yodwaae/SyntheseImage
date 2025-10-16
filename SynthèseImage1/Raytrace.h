@@ -27,7 +27,6 @@ struct Material {
 
             return res;
         }
-
 };
 
 struct Ray {
@@ -51,7 +50,7 @@ struct Light {
 
     public:
         Point position;
-        double power; // TODO To see if I do a proper tonemap, if Light has a color or just a vec3 for power (but that would need a new class, etc ...)
+        double power;
 };
 
 
@@ -66,7 +65,7 @@ struct Light {
 
 double rayIntersectSphere(const Ray& ray, const Sphere& sphere);
 double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance);
-vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, size_t WIDTH, size_t HEIGHT);
+vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor = { 255, 0, 220 });
 
 #pragma endregion
 
