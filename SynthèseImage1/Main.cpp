@@ -30,7 +30,7 @@ int main()
     vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2, sphere3 };
 
     // Light creation
-    Light light{ Point(250, 250, 0), 30000};
+    Light light{ Point(250, 250, 0), Vector3(0, 30000, 30000)};
 
     // Image creation
     vector<Color> colVec = computeSpheresIntersect(light, spheres, 1.001, WIDTH, HEIGHT);

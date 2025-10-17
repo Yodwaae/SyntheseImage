@@ -27,10 +27,12 @@ struct Material {
         Color color;
         Albedo albedo;
 
-        Color displayedColor(double lightIntensity) const {
+        Color displayedColor(Vector3 lightIntensity) const {
+
+            Vector3 gammaCorrectedLightIntensity = Vector3(pow(lightIntensity.getA(), GAMMA_CORRRECTION), pow(lightIntensity.getB(), GAMMA_CORRRECTION), pow(lightIntensity.getC(), GAMMA_CORRRECTION));
 
             // Apply the gamma correction and the albedo to the material color
-            Color res = color * pow(lightIntensity, GAMMA_CORRRECTION) * albedo ;
+            Color res = color * gammaCorrectedLightIntensity * albedo ;
 
             return res;
         }
@@ -53,11 +55,13 @@ struct Sphere {
 
 };
 
+// TODO Refacto, clean up and improve the light color logic
+// TODO Maybe I should have just added a color to the light and keep the power as a double ? would have been simpler ?
 struct Light {
 
     public:
         Point position;
-        double power;
+        Vector3 power;
 };
 
 
@@ -71,7 +75,7 @@ struct Light {
 #pragma region === INTERSECTIONS ===
 
 double rayIntersectSphere(const Ray& ray, const Sphere& sphere);
-double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance);
+Vector3 lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance);
 vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor = { 255, 0, 220 });
 
 #pragma endregion

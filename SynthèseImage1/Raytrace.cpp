@@ -52,7 +52,7 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
 }
 
-double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
+Vector3 lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
 
     // Initialisation (values for cosine and attenuation)
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
@@ -65,8 +65,8 @@ double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sp
     double lightAngle = sphereNormal.dot(normalisedDirectionToLight);
 
     // Compute attenuation (inverse-square law) and final light intensity
-    double attenuation = light.power /lightDistanceSquared;
-    double lightIntensity = lightAngle * attenuation;
+    Vector3 attenuation = light.power /lightDistanceSquared;
+    Vector3 lightIntensity =  attenuation * lightAngle;
 
     return lightIntensity;
 }
@@ -109,7 +109,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
             // If a sphere is hit set the color based on material and light intensity
             // Else set the color to background/missing texture
             if (hitSphere) {
-                double lightIntensity = lightIntersectSphere(light, ray, *hitSphere, nearestDist);
+                Vector3 lightIntensity = lightIntersectSphere(light, ray, *hitSphere, nearestDist);
                 colorValue = hitSphere->material.displayedColor(lightIntensity);
                 colVec[y * WIDTH + x] = colorValue;
             }

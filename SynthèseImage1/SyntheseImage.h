@@ -28,6 +28,8 @@ static constexpr double EPSILON = 1e-9;
 
 #pragma region ========== CLASSES ==========
 
+
+// TODO the vector3 operators are not working both way, yet it might not be a problem as I should not access them outside the Vec3CRTP wrapper 
 class Vector3 {
 
 	private :
@@ -289,6 +291,8 @@ class Albedo : public Vector3CRTP<Albedo> {
 
 
 #pragma region =========== NON-MEMBER OPERATORS ==========
+
+// TODO CRTP * Scalar might have caused a bug when implementing light color, need to stay vigilant
 
 // VECTOR3CRTP<T> * SCALAR
 template <typename T>
