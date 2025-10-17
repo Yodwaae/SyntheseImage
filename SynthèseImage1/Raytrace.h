@@ -54,8 +54,7 @@ struct Light {
 
     public:
         Point position;
-        const LightPower power; // TODO Need to modify GammaCorrection() so power doesn't need to be a const
-                               // or should I put every variables in my struct const ? (I  don't really modify them once created, at least I don't think so
+        LightPower power;
 };
 
 

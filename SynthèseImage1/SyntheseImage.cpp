@@ -328,8 +328,8 @@ using namespace std;
 
 #pragma region ===== FUNCTIONS =====
 
-    LightPower const LightPower::GammaCorrection() const{
-        LightPower res = LightPower(pow(getA(), GAMMA_CORRRECTION), pow(getB(), GAMMA_CORRRECTION), pow(getC(), GAMMA_CORRRECTION));
+    LightPower LightPower::GammaCorrection() const {
+        LightPower res = Vector3(pow(getA(), GAMMA_CORRECTION), pow(getB(), GAMMA_CORRECTION), pow(getC(), GAMMA_CORRECTION));
 
         return res;
     }

@@ -24,7 +24,7 @@ class LightPower;
 #pragma region ========== GLOBALS ==========
 
 static constexpr double EPSILON = 1e-9;
-constexpr double GAMMA_CORRRECTION = 1 / 2.2;
+constexpr double GAMMA_CORRECTION = 1 / 2.2;
 
 #pragma endregion
 
@@ -145,7 +145,7 @@ class Vector3CRTP {
 		// NOTE : Stay vigilant about the T return, should be safer but could cause error wuth the way the logic is implemented
 		// SCALAR
 		T operator*(const double amount) const { return T(_vect * amount); }
-		T operator/(const double amount) const { return T(_vect / amount); } // TODO Should it be here or in LightPower ?
+		T operator/(const double amount) const { return T(_vect / amount); }
 
 		#pragma endregion
 
@@ -297,11 +297,10 @@ class Albedo : public Vector3CRTP<Albedo> {
 };
 
 class LightPower : public Vector3CRTP<LightPower>{
-	// TODO Need to clean this up
+
 public:
 
 	using Vector3CRTP<LightPower>::Vector3CRTP;
-
 
 	#pragma region ===== FUNCTIONS =====
 
@@ -309,7 +308,7 @@ public:
 	static Vector3 Clamp(const Vector3& vec) { return vec; }
 	static Vector3 Clamp(double x, double y, double z) { return Vector3(x, y, z); }
 	
-	LightPower const GammaCorrection() const;
+	LightPower GammaCorrection() const;
 
 	#pragma endregion
 
