@@ -71,7 +71,7 @@ double lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sp
     return lightIntensity;
 }
 
-
+// REFACTO : Divide in multiple functions ? (cleaner but potentially more overhead OR I use static inline for the "helpers" functions ?)
 vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor) {
     
     // Initialisation
@@ -79,7 +79,6 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
     double verticalOffset = WIDTH / 2;
     double horizontalOffset = HEIGHT / 2;
 
-    // TODO Obviously there a big work of refactoring to do here 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
 
@@ -95,7 +94,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
             NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
             Ray ray{ pNearPlane, planeDistance };
             
-            // For each pixel try to see if there's an interesct with a sphere
+            // For this pixel try to see if there's an interesect with a sphere
             // If there's multiple intersections keep the closest hit that is > 0
             for (const Sphere& sphere : spheres) {
                 double intersectionDist = rayIntersectSphere(ray, sphere);
@@ -107,9 +106,9 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
                 }
             }
             
-            // Set the Color
+            // If a sphere is hit set the color based on material and light intensity
+            // Else set the color to background/missing texture
             if (hitSphere) {
-                
                 double lightIntensity = lightIntersectSphere(light, ray, *hitSphere, nearestDist);
                 colorValue = hitSphere->material.displayedColor(lightIntensity);
                 colVec[y * WIDTH + x] = colorValue;

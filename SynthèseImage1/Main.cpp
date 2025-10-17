@@ -27,10 +27,10 @@ int main()
     Sphere sphere3{ Point(250, 270, 410), 80, Material{Color(255, 255, 0), Albedo(1, 1, 1)} };
 
     // Sphere vector
-    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, sphere1, sphere2, sphere3 };
+    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2, sphere3 };
 
     // Light creation
-    Light light{ Point(250, 250, 0), 100000};
+    Light light{ Point(250, 250, 0), 30000};
 
     // Image creation
     vector<Color> colVec = computeSpheresIntersect(light, spheres, 1.001, WIDTH, HEIGHT);

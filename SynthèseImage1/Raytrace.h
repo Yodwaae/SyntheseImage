@@ -12,6 +12,12 @@ using namespace std;
 // TODO : Add the behavior to the material (metal, glass, ...) + I don't really like that I added a function to the material struct but don't think there's another way (or make material a func)
 // Although good to note that color is no longer necessary as the three channel reflection will create the color, need to think about that
 
+#pragma region ===== GLOBALS =====
+
+constexpr double GAMMA_CORRRECTION = 1 / 2.2;
+
+#pragma endregion
+
 #pragma region ===== STRUCTURES =====
 
 
@@ -23,7 +29,8 @@ struct Material {
 
         Color displayedColor(double lightIntensity) const {
 
-            Color res = color * albedo * lightIntensity;
+            // Apply the gamma correction and the albedo to the material color
+            Color res = color * pow(lightIntensity, GAMMA_CORRRECTION) * albedo ;
 
             return res;
         }
