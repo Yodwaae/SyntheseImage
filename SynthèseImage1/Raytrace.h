@@ -12,11 +12,6 @@ using namespace std;
 // TODO : Add the behavior to the material (metal, glass, ...) + I don't really like that I added a function to the material struct but don't think there's another way (or make material a func)
 // Although good to note that color is no longer necessary as the three channel reflection will create the color, need to think about that
 
-#pragma region ===== GLOBALS =====
-
-constexpr double GAMMA_CORRRECTION = 1 / 2.2;
-
-#pragma endregion
 
 #pragma region ===== STRUCTURES =====
 
@@ -27,12 +22,10 @@ struct Material {
         Color color;
         Albedo albedo;
 
-        Color displayedColor(Vector3 lightIntensity) const {
-
-            Vector3 gammaCorrectedLightIntensity = Vector3(pow(lightIntensity.getA(), GAMMA_CORRRECTION), pow(lightIntensity.getB(), GAMMA_CORRRECTION), pow(lightIntensity.getC(), GAMMA_CORRRECTION));
+        Color displayedColor(const LightPower& lightIntensity) const {
 
             // Apply the gamma correction and the albedo to the material color
-            Color res = color * gammaCorrectedLightIntensity * albedo ;
+            Color res = (color * lightIntensity.GammaCorrection() ) * albedo ;
 
             return res;
         }
@@ -61,7 +54,8 @@ struct Light {
 
     public:
         Point position;
-        Vector3 power;
+        const LightPower power; // TODO Need to modify GammaCorrection() so power doesn't need to be a const
+                               // or should I put every variables in my struct const ? (I  don't really modify them once created, at least I don't think so
 };
 
 
@@ -75,7 +69,7 @@ struct Light {
 #pragma region === INTERSECTIONS ===
 
 double rayIntersectSphere(const Ray& ray, const Sphere& sphere);
-Vector3 lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance);
+LightPower lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance);
 vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor = { 255, 0, 220 });
 
 #pragma endregion

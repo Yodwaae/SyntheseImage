@@ -304,6 +304,12 @@ using namespace std;
         return Color(res);
     }
 
+    Color Color::operator*(const LightPower& lightPower) const {
+        Vector3 res = _vect * lightPower.getVect();
+
+        return Color(res);
+    }
+
     #pragma endregion
 
 #pragma endregion
@@ -318,16 +324,16 @@ using namespace std;
 
 #pragma endregion
 
+#pragma region ========== LIGHT POWER ==========
 
-//class NormalizedDirection {
+#pragma region ===== FUNCTIONS =====
 
-//        Vector3 operator+(const NormalizedDirection& other) {
-//            
-//            Vector3 res = _vect + other._vect;
-//
-//            return res;
-//        }
-//
-//};
-//
-//
+    LightPower const LightPower::GammaCorrection() const{
+        LightPower res = LightPower(pow(getA(), GAMMA_CORRRECTION), pow(getB(), GAMMA_CORRRECTION), pow(getC(), GAMMA_CORRRECTION));
+
+        return res;
+    }
+
+#pragma endregion
+
+#pragma endregion

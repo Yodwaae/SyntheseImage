@@ -7,6 +7,7 @@
 // NOTE : Commutative operator that impact two differents classes also have a function to reverse the expression allowing the operator to work both ways
 
 // TODO : Also decide whether in class I organise things by access (public/private) then by type (variable/functions) or the other way around
+// TODO : Rename all the clamp function that are not actually clamp to policy, and have policy call clamp for the class that needs it
 
 #pragma region ========== FORWARD DECLARATIONS ==========
 
@@ -15,6 +16,7 @@ class Point;
 class NormalisedDirection;
 class Color;
 class Albedo;
+class LightPower;
 
 #pragma endregion
 
@@ -22,6 +24,7 @@ class Albedo;
 #pragma region ========== GLOBALS ==========
 
 static constexpr double EPSILON = 1e-9;
+constexpr double GAMMA_CORRRECTION = 1 / 2.2;
 
 #pragma endregion
 
@@ -121,11 +124,13 @@ class Vector3CRTP {
 		// Note : Using a static polyphormism hook to allow classes like Color to clamp the value
 		// Also defining a default clamp because some classes (Point & Direction) won't define one
 
+		// TODO Should others constructors be made explicit ? To keep an eye on
+
 		// Default
 		Vector3CRTP(): _vect() {}
 
 		// From Scalar
-		Vector3CRTP(double scal): _vect(T::Clamp(scal)) {}
+		explicit Vector3CRTP(double scal): _vect(T::Clamp(scal)) {}
 
 		// From Vec3
 		Vector3CRTP(const Vector3& vec) : _vect(T::Clamp(vec)) {}
@@ -138,7 +143,9 @@ class Vector3CRTP {
 		#pragma region ===== OPERATORS =====
 		
 		// NOTE : Stay vigilant about the T return, should be safer but could cause error wuth the way the logic is implemented
+		// SCALAR
 		T operator*(const double amount) const { return T(_vect * amount); }
+		T operator/(const double amount) const { return T(_vect / amount); } // TODO Should it be here or in LightPower ?
 
 		#pragma endregion
 
@@ -265,8 +272,10 @@ class Color : public Vector3CRTP<Color> {
 		// COLOR * SURFACE ABSORPTION
 		Color operator*(const Albedo& albedo) const;
 
-		#pragma endregion
+		// COLOR * LIGHT POWER
+		Color operator*(const LightPower& lightPower) const;
 
+		#pragma endregion
 
 };
 
@@ -287,17 +296,40 @@ class Albedo : public Vector3CRTP<Albedo> {
 
 };
 
+class LightPower : public Vector3CRTP<LightPower>{
+	// TODO Need to clean this up
+public:
+
+	using Vector3CRTP<LightPower>::Vector3CRTP;
+
+
+	#pragma region ===== FUNCTIONS =====
+
+	static double Clamp(const double scal) { return scal; }
+	static Vector3 Clamp(const Vector3& vec) { return vec; }
+	static Vector3 Clamp(double x, double y, double z) { return Vector3(x, y, z); }
+	
+	LightPower const GammaCorrection() const;
+
+	#pragma endregion
+
+};
+
 #pragma endregion
 
 
 #pragma region =========== NON-MEMBER OPERATORS ==========
 
-// TODO CRTP * Scalar might have caused a bug when implementing light color, need to stay vigilant
-
 // VECTOR3CRTP<T> * SCALAR
 template <typename T>
-inline Vector3CRTP<T> operator*(double scalar, const Vector3CRTP<T>& t) {
+inline T operator*(double scalar, const Vector3CRTP<T>& t) {
 	return t * scalar;
+}
+
+// VECTOR3CRTP<T> / SCALAR
+template <typename T>
+inline T operator/(double scalar, const Vector3CRTP<T>& t) {
+	return t / scalar;
 }
 
 // DIRECTION + POINT
@@ -308,6 +340,11 @@ inline Point operator+(const Direction& dir, const Point& point) {
 // SURFACE ABSORPTION * COLOR
 inline Color operator*(const Albedo& albedo, const Color& color) {
 	return color * albedo;
+}
+
+// LIGHT POWER * COLOR
+inline Color operator*(const LightPower& lightPower, const Color& color) {
+	return color * lightPower;
 }
 
 #pragma endregion
