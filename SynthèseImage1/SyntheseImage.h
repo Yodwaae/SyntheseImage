@@ -126,13 +126,13 @@ class Vector3CRTP {
 		Vector3CRTP(): _vect() {}
 
 		// From Scalar
-		explicit Vector3CRTP(double scal): _vect(T::Policy(scal)) {}
+		explicit Vector3CRTP(double scal): _vect(ApplyPolicy(scal)) {}
 
 		// From Vec3
-		Vector3CRTP(const Vector3& vec) : _vect(T::Policy(vec)) {}
+		Vector3CRTP(const Vector3& vec) : _vect(ApplyPolicy(vec)) {}
 
 		 // Explicit
-		Vector3CRTP(double x, double y, double z): _vect(T::Policy(x, y, z)) {}
+		Vector3CRTP(double x, double y, double z): _vect(ApplyPolicy(x, y, z)) {}
 
 		#pragma endregion
 
@@ -146,6 +146,20 @@ class Vector3CRTP {
 		#pragma endregion
 
 		#pragma region ===== FUNCTIONS =====
+
+		// POLICY
+		static double ApplyPolicy(double v) { return T::Policy(v); }
+
+		static Vector3 ApplyPolicy(const Vector3& vec) {
+			return Vector3(T::Policy(vec.getA()),
+				T::Policy(vec.getB()),
+				T::Policy(vec.getC()));
+		}
+
+		static Vector3 ApplyPolicy(double x, double y, double z) {
+			return ApplyPolicy(Vector3(x, y, z));
+		}
+
 
 		const double dot(const Vector3CRTP<T>& other) const { return _vect.dot(other._vect); }
 
@@ -177,8 +191,6 @@ class Point : public Vector3CRTP<Point> {
 
 		// POLICY
 		inline static double Policy(const double scal) { return scal; }
-		inline static Vector3 Policy(const Vector3& vec) { return vec; }
-		inline static Vector3 Policy(double x, double y, double z) { return Vector3(x, y, z); }
 
 		// DIRECTION & DISTANCE
 		Direction DirectionTo(const Point& other) const;
@@ -199,8 +211,6 @@ class Direction : public Vector3CRTP<Direction> {
 
 		// POLICY
 		inline static double Policy(const double scal) { return scal; }
-		inline static Vector3 Policy(const Vector3& vec) { return vec; }
-		inline static Vector3 Policy(double x, double y, double z) { return Vector3(x, y , z); }
 
 		// NORMALISE
 		NormalisedDirection Normalise() const;
@@ -234,8 +244,8 @@ class NormalisedDirection : public Direction {
 		#pragma region ===== FUNCTIONS =====
 
 		// POLICY
-		inline static double Policy(const double scal) { return Policy(Vector3(scal, scal, scal)).getA(); }
-		inline static Vector3 Policy(double x, double y, double z) { return Policy(Vector3(x, y, z)); }
+		inline static double Policy(const double scal) { return Normalise(Vector3(scal, scal, scal)).getA(); }
+		inline static Vector3 Policy(double x, double y, double z) { return Normalise(Vector3(x, y, z)); }
 		inline static Vector3 Policy(const Vector3& vec) { return Normalise(vec); }
 
 		/* Normalizes 'vec' so its length becomes 1
@@ -266,8 +276,6 @@ class Color : public Vector3CRTP<Color> {
 
 		// POLICY
 		inline static double Policy(const double scal) { return Clamp(scal); }
-		inline static Vector3 Policy(const Vector3& vec) { return Vector3(Policy(vec.getA()), Policy(vec.getB()), Policy(vec.getC())); }
-		inline static Vector3 Policy(double x, double y, double z) { return Vector3(Policy(x), Policy(y), Policy(z)); }
 
 		// CLAMPING
 		inline static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
@@ -295,8 +303,6 @@ class Albedo : public Vector3CRTP<Albedo> {
 
 		// POLICY
 		inline static double Policy(const double scal) {return Clamp(scal);}
-		inline static Vector3 Policy(const Vector3& vec) { return Vector3(Policy(vec.getA()), Policy(vec.getB()), Policy(vec.getC())); }
-		inline static Vector3 Policy(double x, double y, double z) { return Vector3(Policy(x), Policy(y), Policy(z)); }
 
 		// CLAMPING
 		inline static double Clamp(const double scal) { return std::clamp(scal, 0.0, 1.0); }
@@ -315,8 +321,6 @@ public:
 
 	// POLICY
 	inline static double Policy(const double scal) { return scal; }
-	inline static Vector3 Policy(const Vector3& vec) { return vec; }
-	inline static Vector3 Policy(double x, double y, double z) { return Vector3(x, y, z); }
 	
 	// GAMMA CORRECTION
 	LightPower GammaCorrection() const;
