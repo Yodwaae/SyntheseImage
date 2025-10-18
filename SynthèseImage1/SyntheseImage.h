@@ -7,7 +7,6 @@
 // NOTE : Commutative operator that impact two differents classes also have a function to reverse the expression allowing the operator to work both ways
 
 // TODO : Also decide whether in class I organise things by access (public/private) then by type (variable/functions) or the other way around
-// TODO : Rename all the clamp function that are not actually clamp to policy, and have policy call clamp for the class that needs it
 
 #pragma region ========== FORWARD DECLARATIONS ==========
 
@@ -121,22 +120,19 @@ class Vector3CRTP {
 	public:
 	
 		#pragma region ===== CONSTRUCTORS =====
-		// Note : Using a static polyphormism hook to allow classes like Color to clamp the value
-		// Also defining a default clamp because some classes (Point & Direction) won't define one
-
 		// TODO Should others constructors be made explicit ? To keep an eye on
 
 		// Default
 		Vector3CRTP(): _vect() {}
 
 		// From Scalar
-		explicit Vector3CRTP(double scal): _vect(T::Clamp(scal)) {}
+		explicit Vector3CRTP(double scal): _vect(T::Policy(scal)) {}
 
 		// From Vec3
-		Vector3CRTP(const Vector3& vec) : _vect(T::Clamp(vec)) {}
+		Vector3CRTP(const Vector3& vec) : _vect(T::Policy(vec)) {}
 
 		 // Explicit
-		Vector3CRTP(double x, double y, double z): _vect(T::Clamp(x, y, z)) {}
+		Vector3CRTP(double x, double y, double z): _vect(T::Policy(x, y, z)) {}
 
 		#pragma endregion
 
@@ -152,7 +148,6 @@ class Vector3CRTP {
 		#pragma region ===== FUNCTIONS =====
 
 		const double dot(const Vector3CRTP<T>& other) const { return _vect.dot(other._vect); }
-
 
 		// NOTE : Do not create overhead as they are inlined by the compiler
 		const Vector3& getVect() const { return _vect; }
@@ -179,10 +174,13 @@ class Point : public Vector3CRTP<Point> {
 
 
 		#pragma region ===== FUNCTIONS =====
-		static double Clamp(const double scal) { return scal; }
-		static Vector3 Clamp(const Vector3& vec) { return vec; }
-		static Vector3 Clamp(double x, double y, double z) { return Vector3(x, y, z); }
 
+		// POLICY
+		inline static double Policy(const double scal) { return scal; }
+		inline static Vector3 Policy(const Vector3& vec) { return vec; }
+		inline static Vector3 Policy(double x, double y, double z) { return Vector3(x, y, z); }
+
+		// DIRECTION & DISTANCE
 		Direction DirectionTo(const Point& other) const;
 		NormalisedDirection NormalisedDirectionTo(const Point& other) const;
 		double DistanceTo(const Point& other) const;
@@ -199,11 +197,12 @@ class Direction : public Vector3CRTP<Direction> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		// Chain the clamp functions so the derived class only as to redefine the double one
-		static double Clamp(const double scal) { return scal; }
-		static Vector3 Clamp(const Vector3& vec) { return vec; }
-		static Vector3 Clamp(double x, double y, double z) { return Vector3(x, y , z); }
+		// POLICY
+		inline static double Policy(const double scal) { return scal; }
+		inline static Vector3 Policy(const Vector3& vec) { return vec; }
+		inline static Vector3 Policy(double x, double y, double z) { return Vector3(x, y , z); }
 
+		// NORMALISE
 		NormalisedDirection Normalise() const;
 
 		#pragma endregion
@@ -214,6 +213,8 @@ class Direction : public Vector3CRTP<Direction> {
 class NormalisedDirection : public Direction {
 
 	public:
+
+		#pragma region ===== CONSTRUCTORS =====
 
 		// OPTI If I keep this approach I'll compute the default normalisedDirection at compile time and store it as constexpr
 		// Default, normalise a (1, 1, 1) vector because a (0, 0, 0) can't be normalised as it's length will always be 0
@@ -228,11 +229,14 @@ class NormalisedDirection : public Direction {
 		// Explicit
 		NormalisedDirection(double x, double y, double z): Direction(Normalise(Vector3(x, y, z))) {}
 
+		#pragma endregion
+
 		#pragma region ===== FUNCTIONS =====
 
-		static double Clamp(const double scal) { return Clamp(Vector3(scal, scal, scal)).getA(); }
-		static Vector3 Clamp(double x, double y, double z) { return Clamp(Vector3(x, y, z)); }
-		static Vector3 Clamp(const Vector3& vec) { return Normalise(vec); }
+		// POLICY
+		inline static double Policy(const double scal) { return Policy(Vector3(scal, scal, scal)).getA(); }
+		inline static Vector3 Policy(double x, double y, double z) { return Policy(Vector3(x, y, z)); }
+		inline static Vector3 Policy(const Vector3& vec) { return Normalise(vec); }
 
 		/* Normalizes 'vec' so its length becomes 1
 		* If 'vec' is nearly zero-length, returns (0, 0, 0) instead
@@ -255,15 +259,18 @@ class Color : public Vector3CRTP<Color> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		// Getters
+		// GETTERS
 		const double getRed() const { return getA(); }
 		const double getGreen() const { return getB(); }
 		const double getBlue() const{ return getC(); }
 
-		// Color clamping between 0 and 255
-		static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
-		static Vector3 Clamp(const Vector3& vec) { return Vector3(Clamp(vec.getA()), Clamp(vec.getB()), Clamp(vec.getC())); }
-		static Vector3 Clamp(double x, double y, double z) { return Vector3(Clamp(x), Clamp(y), Clamp(z)); }
+		// POLICY
+		inline static double Policy(const double scal) { return Clamp(scal); }
+		inline static Vector3 Policy(const Vector3& vec) { return Vector3(Policy(vec.getA()), Policy(vec.getB()), Policy(vec.getC())); }
+		inline static Vector3 Policy(double x, double y, double z) { return Vector3(Policy(x), Policy(y), Policy(z)); }
+
+		// CLAMPING
+		inline static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
 
 		#pragma endregion
 
@@ -286,11 +293,13 @@ class Albedo : public Vector3CRTP<Albedo> {
 
 		#pragma region ===== FUNCTIONS =====
 
-		// Clamping between 0 and 1 to have an absorption coef
-		static double Clamp(const double scal) {return std::clamp(scal, 0.0, 1.0);}
-		static Vector3 Clamp(const Vector3& vec) { return Vector3(Clamp(vec.getA()), Clamp(vec.getB()), Clamp(vec.getC())); }
-		static Vector3 Clamp(double x, double y, double z) { return Vector3(Clamp(x), Clamp(y), Clamp(z)); }
+		// POLICY
+		inline static double Policy(const double scal) {return Clamp(scal);}
+		inline static Vector3 Policy(const Vector3& vec) { return Vector3(Policy(vec.getA()), Policy(vec.getB()), Policy(vec.getC())); }
+		inline static Vector3 Policy(double x, double y, double z) { return Vector3(Policy(x), Policy(y), Policy(z)); }
 
+		// CLAMPING
+		inline static double Clamp(const double scal) { return std::clamp(scal, 0.0, 1.0); }
 
 		#pragma endregion
 
@@ -304,10 +313,12 @@ public:
 
 	#pragma region ===== FUNCTIONS =====
 
-	static double Clamp(const double scal) { return scal; }
-	static Vector3 Clamp(const Vector3& vec) { return vec; }
-	static Vector3 Clamp(double x, double y, double z) { return Vector3(x, y, z); }
+	// POLICY
+	inline static double Policy(const double scal) { return scal; }
+	inline static Vector3 Policy(const Vector3& vec) { return vec; }
+	inline static Vector3 Policy(double x, double y, double z) { return Vector3(x, y, z); }
 	
+	// GAMMA CORRECTION
 	LightPower GammaCorrection() const;
 
 	#pragma endregion
