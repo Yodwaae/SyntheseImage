@@ -196,6 +196,7 @@ class Point : public Vector3CRTP<Point> {
 		Direction DirectionTo(const Point& other) const;
 		NormalisedDirection NormalisedDirectionTo(const Point& other) const;
 		double DistanceTo(const Point& other) const;
+		double SquaredDistanceTo(const Point& other) const;
 
 		#pragma endregion
 

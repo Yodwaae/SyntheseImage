@@ -56,13 +56,12 @@ LightPower lightIntersectSphere(const Light& light, const Ray& ray, const Sphere
 
     // Initialisation (values for cosine and attenuation)
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
-    NormalisedDirection normalisedDirectionToLight = intersectionPoint.NormalisedDirectionTo(light.position);
-    NormalisedDirection sphereNormal = sphere.center.NormalisedDirectionTo(intersectionPoint);
-    Direction directionToLight = intersectionPoint.DirectionTo(light.position);
-    double lightDistanceSquared = directionToLight.dot(directionToLight);
+    NormalisedDirection dirToLight = intersectionPoint.NormalisedDirectionTo(light.position);
+    NormalisedDirection normal = sphere.center.NormalisedDirectionTo(intersectionPoint);
+    double lightDistanceSquared = intersectionPoint.SquaredDistanceTo(light.position);
 
     // Compute cosine of angle between surface normal and light direction
-    double lightAngle = sphereNormal.dot(normalisedDirectionToLight);
+    double lightAngle = normal.dot(dirToLight);
 
     // Compute attenuation (inverse-square law) and final light intensity
     LightPower attenuation = light.power / lightDistanceSquared;

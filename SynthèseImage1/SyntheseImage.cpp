@@ -264,6 +264,13 @@ using namespace std;
         return res;
     }
 
+    // SQUARED DISTANCE TO
+    double Point::SquaredDistanceTo(const Point& other) const {
+        double res = pow(DistanceTo(other), 2);
+
+        return res;
+    }
+
     #pragma endregion
 
 #pragma endregion

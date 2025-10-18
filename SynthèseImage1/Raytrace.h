@@ -48,8 +48,6 @@ struct Sphere {
 
 };
 
-// TODO Refacto, clean up and improve the light color logic
-// TODO Maybe I should have just added a color to the light and keep the power as a double ? would have been simpler ?
 struct Light {
 
     public:
