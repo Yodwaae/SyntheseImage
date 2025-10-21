@@ -8,6 +8,12 @@
 
 using namespace std;
 
+#pragma region ========== GLOBALS ==========
+
+static constexpr double BIAS = 0.1;
+
+#pragma endregion
+
 #pragma region ===== FUNCTIONS =====
 
 // TODO Refacto and improve the way the function chain each other, where some part of the logic are
@@ -52,12 +58,12 @@ double rayIntersectSphere(const Ray& ray, const Sphere& sphere) {
 
 }
 
-LightPower lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, double intersectDistance) {
+LightPower lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& hitSphere, const vector<Sphere>& spheres, double intersectDistance) {
 
     // Initialisation (values for cosine and attenuation)
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
     NormalisedDirection dirToLight = intersectionPoint.NormalisedDirectionTo(light.position);
-    NormalisedDirection normal = sphere.center.NormalisedDirectionTo(intersectionPoint);
+    NormalisedDirection normal = hitSphere.center.NormalisedDirectionTo(intersectionPoint);
     double lightDistanceSquared = intersectionPoint.SquaredDistanceTo(light.position);
 
     // Compute cosine of angle between surface normal and light direction
@@ -66,6 +72,31 @@ LightPower lightIntersectSphere(const Light& light, const Ray& ray, const Sphere
     // Compute attenuation (inverse-square law) and final light intensity
     LightPower attenuation = light.power / lightDistanceSquared;
     LightPower lightIntensity =  attenuation * lightAngle;
+
+    // Test for casted shadow
+    bool canSeeLightSource = true;
+
+    Ray shadowRay{
+        intersectionPoint + BIAS * dirToLight,
+        dirToLight
+    };
+
+
+    for (const Sphere& other : spheres) {
+
+        // NOTE Could Ignore self but in the future we might have object that cast shadow on themselves
+
+        double lightIntersect = rayIntersectSphere(shadowRay, other);
+
+        if (pow(lightIntersect, 2) < lightDistanceSquared && lightIntersect > 0) {
+            canSeeLightSource = false;
+            break;
+        }
+    }
+
+    if (!canSeeLightSource)
+        lightIntensity = lightIntensity * 0;
+
 
     return lightIntensity;
 }
@@ -108,7 +139,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
             // If a sphere is hit set the color based on material and light intensity
             // Else set the color to background/missing texture
             if (hitSphere) {
-                LightPower lightIntensity = lightIntersectSphere(light, ray, *hitSphere, nearestDist);
+                LightPower lightIntensity = lightIntersectSphere(light, ray, *hitSphere, spheres, nearestDist);
                 colorValue = hitSphere->material.displayedColor(lightIntensity);
                 colVec[y * WIDTH + x] = colorValue;
             }
