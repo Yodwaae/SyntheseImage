@@ -27,7 +27,7 @@ int main()
     Sphere sphere3{ Point(250, 270, 410), 80, Material{Color(255, 255, 0), Albedo(1, 1, 1)} };
 
     // Sphere vector
-    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2, sphere3 };
+    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2 };
 
     // Light creation
     Light light{ Point(250, 250, 0), Vector3(30000, 30000, 30000)};
