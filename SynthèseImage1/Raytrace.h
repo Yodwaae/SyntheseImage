@@ -66,8 +66,8 @@ struct Light {
 #pragma region === INTERSECTIONS ===
 
 tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sphere>& spheres);
-LightPower lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& sphere, const vector<Sphere>& spheres, double intersectDistance);
-vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor = { 255, 0, 220 });
+LightPower lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const Sphere& sphere, const vector<Sphere>& spheres, double intersectDistance);
+vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor = { 255, 0, 220 });
 
 #pragma endregion
 

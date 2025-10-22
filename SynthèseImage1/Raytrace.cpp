@@ -20,7 +20,6 @@ static constexpr double BIAS = 0.1;
 // TODO Refacto and improve the way the function chain each other, where some part of the logic are
 // TODO Create a RayIntersect Object (should it wrap or replace rayIntersectSphere ?)
 
-// TODO I could sort the spheres/objects on the Z axis at the start of the program then check in order and break as soon as I get a hit
 tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sphere>& spheres) {
     // Loop Initialisation
     double nearestDist = INFINITY;
@@ -64,40 +63,47 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
     return make_tuple(hitSphere, nearestDist);
 }
 
-// TODO Instead of ray tracing 2 times (light -> point then point -> light, I should directly do the second one and check if there's a hit between the objectand the light)
-// TODO Add the management of multiple lights
-LightPower lightIntersectSphere(const Light& light, const Ray& ray, const Sphere& hitSphere, const vector<Sphere>& spheres, double intersectDistance) {
+// TODO Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
+// TODO Should add multiple lights management before that though
+LightPower lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const Sphere& hitSphere, const vector<Sphere>& spheres, double intersectDistance) {
 
     // ===== LIGHTS =====
-    
-    // Light Initialisation (values for cosine and attenuation)
-    Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
-    NormalisedDirection dirToLight = intersectionPoint.NormalisedDirectionTo(light.position);
-    NormalisedDirection normal = hitSphere.center.NormalisedDirectionTo(intersectionPoint);
-    double lightDistanceSquared = intersectionPoint.SquaredDistanceTo(light.position);
+    LightPower aglomeratedLight = LightPower(0, 0, 0);
 
-    // Compute cosine of angle between surface normal and light direction
-    double lightAngle = normal.dot(dirToLight);
+    for (const Light& light : lights) {
 
-    // Compute attenuation (inverse-square law) and final light intensity
-    LightPower attenuation = light.power / lightDistanceSquared;
-    LightPower lightIntensity =  attenuation * lightAngle;
+        // Light Initialisation (values for cosine and attenuation)
+        Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
+        NormalisedDirection dirToLight = intersectionPoint.NormalisedDirectionTo(light.position);
+        NormalisedDirection normal = hitSphere.center.NormalisedDirectionTo(intersectionPoint);
+        double lightDistanceSquared = intersectionPoint.SquaredDistanceTo(light.position);
 
-    // ===== SHADOWS =====
+        // Compute cosine of angle between surface normal and light direction
+        double lightAngle = normal.dot(dirToLight);
 
-    // Shadow Initialisation
-    Ray shadowRay{intersectionPoint + BIAS * dirToLight, dirToLight};
+        // Compute attenuation (inverse-square law) and final light intensity
+        LightPower attenuation = light.power / lightDistanceSquared;
+        LightPower lightIntensity = attenuation * lightAngle;
 
-    // Check if a sphere was in between the light and the intersected sphere
-    auto[throwAway, intersectDist] = rayIntersectSpheres(shadowRay, spheres);
-    if (intersectDist * intersectDist < lightDistanceSquared)
-        lightIntensity = lightIntensity * 0;
+        // ===== SHADOWS =====
 
-    return lightIntensity;
+        // Shadow Initialisation
+        Ray shadowRay{ intersectionPoint + BIAS * dirToLight, dirToLight };
+
+        // Check if a sphere was in between the light and the intersected sphere
+        auto [throwAway, intersectDist] = rayIntersectSpheres(shadowRay, spheres);
+        if (intersectDist * intersectDist < lightDistanceSquared)
+            lightIntensity = lightIntensity * 0;
+
+        // Add the light to the total light
+        aglomeratedLight = aglomeratedLight + lightIntensity;
+    }
+
+    return aglomeratedLight;
 }
 
 // REFACTO : Divide in multiple functions ? (cleaner but potentially more overhead OR I use static inline for the "helpers" functions ?)
-vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor) {
+vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor) {
     
     // Initialisation
     vector<Color> colVec(WIDTH * HEIGHT);
@@ -122,7 +128,7 @@ vector<Color> computeSpheresIntersect(const Light& light, const vector<Sphere>& 
             // If a sphere is hit set the color based on material and light intensity
             // Else set the color to background/missing texture
             if (hitSphere) {
-                LightPower lightIntensity = lightIntersectSphere(light, ray, *hitSphere, spheres, dist);
+                LightPower lightIntensity = lightsIntersectSpheres(lights, ray, *hitSphere, spheres, dist);
                 colorValue = hitSphere->material.displayedColor(lightIntensity);
                 colVec[y * WIDTH + x] = colorValue;
             }

@@ -318,6 +318,13 @@ public:
 
 	using Vector3CRTP<LightPower>::Vector3CRTP;
 
+	#pragma region ===== OPERATORS =====
+
+	LightPower operator+(const LightPower& other) const;
+
+	#pragma endregion
+
+
 	#pragma region ===== FUNCTIONS =====
 
 	// POLICY

@@ -333,7 +333,17 @@ using namespace std;
 
 #pragma region ========== LIGHT POWER ==========
 
-#pragma region ===== FUNCTIONS =====
+    #pragma region ===== OPERATORS =====
+
+    LightPower LightPower::operator+(const LightPower& other) const {
+        LightPower res = _vect + other.getVect();
+
+        return res;
+    }
+
+    #pragma endregion
+
+    #pragma region ===== FUNCTIONS =====
 
     LightPower LightPower::GammaCorrection() const {
         LightPower res = Vector3(pow(getA(), GAMMA_CORRECTION), pow(getB(), GAMMA_CORRECTION), pow(getC(), GAMMA_CORRECTION));
@@ -341,6 +351,6 @@ using namespace std;
         return res;
     }
 
-#pragma endregion
+    #pragma endregion
 
 #pragma endregion
