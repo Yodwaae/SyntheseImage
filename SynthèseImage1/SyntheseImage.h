@@ -320,7 +320,15 @@ public:
 
 	#pragma region ===== OPERATORS =====
 
+	#pragma region === ARITHMETIC OPERATORS ===
+
+	#pragma region PURE/VALUE OPERATORS
+
 	LightPower operator+(const LightPower& other) const;
+
+	#pragma region IN PLACE OPERATORS
+
+	LightPower operator+=(const LightPower& other);
 
 	#pragma endregion
 

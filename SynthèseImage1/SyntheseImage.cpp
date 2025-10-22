@@ -341,6 +341,12 @@ using namespace std;
         return res;
     }
 
+    LightPower LightPower::operator+=(const LightPower& other) {
+        LightPower res = _vect += other.getVect();
+
+        return res;
+    }
+
     #pragma endregion
 
     #pragma region ===== FUNCTIONS =====

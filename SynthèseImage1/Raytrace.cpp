@@ -64,18 +64,19 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
 }
 
 // TODO Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
-// TODO Should add multiple lights management before that though
 LightPower lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const Sphere& hitSphere, const vector<Sphere>& spheres, double intersectDistance) {
 
-    // ===== LIGHTS =====
-    LightPower aglomeratedLight = LightPower(0, 0, 0);
+    // Initialisation
+    Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
+    NormalisedDirection normal = hitSphere.center.NormalisedDirectionTo(intersectionPoint);
+    LightPower agglomeratedLight = LightPower(0, 0, 0);
 
     for (const Light& light : lights) {
 
-        // Light Initialisation (values for cosine and attenuation)
-        Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
+        // ===== LIGHTS =====
+
+        // Light loop initialisation (values for cosine and attenuation)
         NormalisedDirection dirToLight = intersectionPoint.NormalisedDirectionTo(light.position);
-        NormalisedDirection normal = hitSphere.center.NormalisedDirectionTo(intersectionPoint);
         double lightDistanceSquared = intersectionPoint.SquaredDistanceTo(light.position);
 
         // Compute cosine of angle between surface normal and light direction
@@ -87,25 +88,26 @@ LightPower lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, c
 
         // ===== SHADOWS =====
 
-        // Shadow Initialisation
+        // Shadow loop initialisation
         Ray shadowRay{ intersectionPoint + BIAS * dirToLight, dirToLight };
 
-        // Check if a sphere was in between the light and the intersected sphere
+        // If a sphere was in between the light and the intersected sphere doesn't add it to the aglomerated light
         auto [throwAway, intersectDist] = rayIntersectSpheres(shadowRay, spheres);
         if (intersectDist * intersectDist < lightDistanceSquared)
-            lightIntensity = lightIntensity * 0;
+            continue;
 
         // Add the light to the total light
-        aglomeratedLight = aglomeratedLight + lightIntensity;
+        agglomeratedLight +=  lightIntensity;
     }
 
-    return aglomeratedLight;
+    return agglomeratedLight;
 }
 
 // REFACTO : Divide in multiple functions ? (cleaner but potentially more overhead OR I use static inline for the "helpers" functions ?)
 vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor) {
     
     // Initialisation
+    // TODO Better way to manage the camera offset ?
     vector<Color> colVec(WIDTH * HEIGHT);
     double verticalOffset = WIDTH / 2;
     double horizontalOffset = HEIGHT / 2;
