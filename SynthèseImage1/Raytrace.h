@@ -37,7 +37,7 @@ class Material {
         Color displayedColor(const LightPower& lightIntensity) const {
 
             // Apply the gamma correction and the albedo to the material color // TODO This calcul might be wrong as I might apply gamma correction too early (should be applied after
-            Color res = (_color * lightIntensity.GammaCorrection() ) * _albedo ;
+            Color res = lightIntensity.GammaCorrection() * _albedo ;
 
             return res;
         }

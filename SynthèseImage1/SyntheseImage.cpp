@@ -315,8 +315,15 @@ using namespace std;
 
     #pragma region ===== OPERATORS =====
 
+    // TODO Should I add a function inline Vector3 Vector3CRTP::MULTIPLY(const Vector3CRTP& other) instead of writing _vect * other.getVect(); every time ? Or is just a bit redundant ?
     LightPower LightPower::operator+(const LightPower& other) const {
         LightPower res = _vect + other.getVect();
+
+        return res;
+    }
+
+    Color LightPower::operator*(const Albedo& other) const {
+        Color res = _vect * other.getVect();
 
         return res;
     }

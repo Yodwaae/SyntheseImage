@@ -23,6 +23,12 @@ class LightPower;
 static constexpr double EPSILON = 1e-9;
 constexpr double GAMMA_CORRECTION = 1 / 2.2;
 
+
+// TODO Not a huge fan of this approach by macro see a better solution that allows do define new operator in crtp derived classes without overwritting the sale ioeratir with differents signatures
+#define INHERIT_CRTP_OPERATORS(CLASS) \
+    using Vector3CRTP<CLASS>::operator*; \
+    using Vector3CRTP<CLASS>::operator/;
+
 #pragma endregion
 
 
@@ -175,7 +181,7 @@ class Vector3CRTP {
 class Point : public Vector3CRTP<Point> {
 
     public:
-
+		INHERIT_CRTP_OPERATORS(Point);
 		using Vector3CRTP<Point>::Vector3CRTP;
 
 		#pragma region ===== OPERATORS =====
@@ -204,7 +210,7 @@ class Point : public Vector3CRTP<Point> {
 class Direction : public Vector3CRTP<Direction> {
 
 	public :
-
+		INHERIT_CRTP_OPERATORS(Direction);
 		using Vector3CRTP<Direction>::Vector3CRTP;
 
 		#pragma region ===== FUNCTIONS =====
@@ -264,7 +270,7 @@ class NormalisedDirection : public Direction {
 class Color : public Vector3CRTP<Color> {
 
 	public :
-
+		INHERIT_CRTP_OPERATORS(Color);
 		using Vector3CRTP<Color>::Vector3CRTP;
 
 		#pragma region ===== FUNCTIONS =====
@@ -298,6 +304,7 @@ class Albedo : public Vector3CRTP<Albedo> {
 	
 	public:
 		using Vector3CRTP<Albedo>::Vector3CRTP;
+		INHERIT_CRTP_OPERATORS(Albedo)
 
 		#pragma region ===== FUNCTIONS =====
 
@@ -314,7 +321,7 @@ class Albedo : public Vector3CRTP<Albedo> {
 class LightPower : public Vector3CRTP<LightPower>{
 
 public:
-
+	INHERIT_CRTP_OPERATORS(LightPower)
 	using Vector3CRTP<LightPower>::Vector3CRTP;
 
 	#pragma region ===== OPERATORS =====
@@ -325,6 +332,8 @@ public:
 	
 	// ADDING LIGHTS
 	LightPower operator+(const LightPower& other) const;
+
+	Color operator*(const Albedo& other) const;
 
 	#pragma region IN PLACE OPERATORS
 
@@ -374,6 +383,11 @@ inline Color operator*(const Albedo& albedo, const Color& color) {
 // LIGHT POWER * COLOR
 inline Color operator*(const LightPower& lightPower, const Color& color) {
 	return color * lightPower;
+}
+
+// LIGHT POWER * ALBEDO
+inline Color operator*(const Albedo& albedo, const LightPower& lightPower) {
+	return lightPower * albedo;
 }
 
 #pragma endregion
