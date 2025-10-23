@@ -9,26 +9,41 @@ using namespace std;
 
 
 // TODO : Wrap Sphere into a struct Object
-// TODO : Add the behavior to the material (metal, glass, ...) + I don't really like that I added a function to the material struct but don't think there's another way (or make material a func)
-// Although good to note that color is no longer necessary as the three channel reflection will create the color, need to think about that
-
 
 #pragma region ===== STRUCTURES =====
 
+// TODO Add the behavior (metal, glass, ...)
+// TODO Color might be a bit redundant but my refacto attempt prooved unsuccessful (If I succesfully remove color should I keep Material as a wrapper of albedo ? Or should I just use Albedo directly/rename it ?)
+class Material {
 
-struct Material {
+    private:
+        Color _color;
+        Albedo _albedo;
 
-    public:
-        Color color;
-        Albedo albedo;
+    public :
+
+        #pragma region === CONSTRUCTORS ===
+
+        // Default
+        Material() : _color(255, 255, 255), _albedo(1, 1, 1){};
+
+        // Explicit
+        Material(const Color& color, const Albedo& albedo) : _color(color), _albedo(albedo) {};
+
+        #pragma endregion
+
+        #pragma region === FUNCTIONS ===
 
         Color displayedColor(const LightPower& lightIntensity) const {
 
-            // Apply the gamma correction and the albedo to the material color
-            Color res = (color * lightIntensity.GammaCorrection() ) * albedo ;
+            // Apply the gamma correction and the albedo to the material color // TODO This calcul might be wrong as I might apply gamma correction too early (should be applied after
+            Color res = (_color * lightIntensity.GammaCorrection() ) * _albedo ;
 
             return res;
         }
+
+        #pragma endregion
+
 };
 
 struct Ray {
@@ -55,8 +70,11 @@ struct Light {
         LightPower power;
 };
 
+struct Object {
 
-
+    public :
+        Sphere sphere;
+};
 
 #pragma endregion
 

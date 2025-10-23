@@ -18,15 +18,15 @@ int main()
     // ===== SPHERES =====
 
     // Wall sphere (used to simulate a box
-    Sphere rightWallSphere{ Point(wallSphereRadius + WIDTH, HEIGHT/2, 0), wallSphereRadius, Material{Color(0, 255, 0), Albedo(1, 1, 1)} };
-    Sphere leftWallSphere{ Point(-wallSphereRadius, HEIGHT/2, 0), wallSphereRadius, Material{Color(255, 0, 0), Albedo(1, 1, 1)} };
-    Sphere upWallSphere{ Point(WIDTH/2, -wallSphereRadius, 0), wallSphereRadius, Material{Color(255, 255, 255), Albedo(1, 1, 1)} };
-    Sphere downWallSphere{ Point(WIDTH/2, wallSphereRadius + HEIGHT, 0), wallSphereRadius, Material{Color(255, 255, 255), Albedo(1, 1, 1)} };
-    Sphere backWallSphere{ Point(WIDTH/2, HEIGHT/2, DEPTH + wallSphereRadius), wallSphereRadius, Material{Color(255, 255, 255), Albedo(1, 1, 1)} };
+    Sphere rightWallSphere{ Point(wallSphereRadius + WIDTH, HEIGHT/2, 0), wallSphereRadius, Material(Color(0, 255, 0), Albedo(1, 1, 1)) };
+    Sphere leftWallSphere{ Point(-wallSphereRadius, HEIGHT/2, 0), wallSphereRadius, Material(Color(255, 0, 0), Albedo(1, 1, 1)) };
+    Sphere upWallSphere{ Point(WIDTH/2, -wallSphereRadius, 0), wallSphereRadius, Material(Color(255, 255, 255), Albedo(1, 1, 1)) };
+    Sphere downWallSphere{ Point(WIDTH/2, wallSphereRadius + HEIGHT, 0), wallSphereRadius, Material(Color(255, 255, 255), Albedo(1, 1, 1)) };
+    Sphere backWallSphere{ Point(WIDTH/2, HEIGHT/2, DEPTH + wallSphereRadius), wallSphereRadius, Material(Color(255, 255, 255), Albedo(1, 1, 1)) };
     // Spheres creation
-    Sphere sphere1{ Point(150, 350, 250), 80, Material{Color(0, 0, 255), Albedo(1, 1, 1)} };
-    Sphere sphere2{ Point(350, 350, 250), 80, Material{Color(255, 255, 255), Albedo(1, 1, 1)} };
-    Sphere sphere3{ Point(250, 270, 410), 80, Material{Color(255, 255, 0), Albedo(1, 1, 1)} };
+    Sphere sphere1{ Point(150, 350, 250), 80, Material(Color(0, 0, 255), Albedo(1, 1, 1))};
+    Sphere sphere2{ Point(350, 350, 250), 80, Material() };
+    Sphere sphere3{ Point(250, 270, 410), 80, Material(Color(255, 255, 0), Albedo(1, 1, 1)) };
     // Sphere vector
     vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2 };
 

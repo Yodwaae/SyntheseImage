@@ -6,8 +6,6 @@
 // Also no need for copy constructor as in that case the compiler created one will work just fine
 // NOTE : Commutative operator that impact two differents classes also have a function to reverse the expression allowing the operator to work both ways
 
-// TODO : Also decide whether in class I organise things by access (public/private) then by type (variable/functions) or the other way around
-
 #pragma region ========== FORWARD DECLARATIONS ==========
 
 class Direction;
@@ -31,28 +29,24 @@ constexpr double GAMMA_CORRECTION = 1 / 2.2;
 #pragma region ========== CLASSES ==========
 
 
-// TODO the vector3 operators are not working both way, yet it might not be a problem as I should not access them outside the Vec3CRTP wrapper 
+
 class Vector3 {
-
-	private :
-
-		double _a, _b, _c;
-
+	// NOTE Non symmetrical operators are not working both ways by design as Vector3 should not be use outside the CRTP wrapper
 	public:
 
 		#pragma region ===== CONSTRUCTORS =====
 			
 			// Default
-			Vector3();
+			Vector3() : _a(0), _b(0), _c(0) {}
 
-			// From Vector
-			Vector3(const Vector3& other);
-			
-			// From Scalar
-			Vector3(double scal);
+			// From scalar
+			Vector3(double scal) : _a(scal), _b(scal), _c(scal) {}
+
+			// Copy constructor (declared just for clarity sake as it's only a value copy, compiler created one would have worked just fine)
+			Vector3(const Vector3& other) : _a(other._a), _b(other._b), _c(other._c) {}
 
 			// Explicit (NOTE :Shouldn't be used anymore but for the moment I keep it as it can be used during debug/temp integration of a feature
-			Vector3(double x, double y, double z);
+			Vector3(double x, double y, double z) :_a(x), _b(y), _c(z) {}
 
 		#pragma endregion
 
@@ -108,14 +102,15 @@ class Vector3 {
 
 		#pragma endregion
 
+	private:
+
+		double _a, _b, _c;
+
+
 };
 
 template <typename T>
 class Vector3CRTP {
-
-	protected:
-
-		Vector3 _vect;
 
 	public:
 	
@@ -170,6 +165,10 @@ class Vector3CRTP {
 		const double getC() const { return _vect.getC(); }
 
 		#pragma endregion
+
+	protected:
+
+		Vector3 _vect;
 
 };
 
@@ -323,7 +322,8 @@ public:
 	#pragma region === ARITHMETIC OPERATORS ===
 
 	#pragma region PURE/VALUE OPERATORS
-
+	
+	// ADDING LIGHTS
 	LightPower operator+(const LightPower& other) const;
 
 	#pragma region IN PLACE OPERATORS
@@ -346,7 +346,6 @@ public:
 };
 
 #pragma endregion
-
 
 #pragma region =========== NON-MEMBER OPERATORS ==========
 

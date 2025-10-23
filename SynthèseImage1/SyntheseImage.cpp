@@ -11,26 +11,6 @@ using namespace std;
 
 
 #pragma region ========== VECTOR3 CLASS ==========
-
-    #pragma region ===== CONSTRUCTORS =====
-        
-    // Default
-    Vector3::Vector3():
-    _a(0), _b(0), _c(0){}
-
-    // From scalar
-    Vector3::Vector3(double scal):
-    _a(scal), _b(scal), _c(scal){}
-
-    // Explicit
-    Vector3::Vector3(double x, double y, double z):
-    _a(x), _b(y), _c(z){}
-
-    // Copy constructor (declared just for clarity sake as it's only a value copy, compiler created one would have worked this fine)
-    Vector3::Vector3(const Vector3& other):
-    _a(other._a), _b(other._b), _c(other._c){}
-
-    #pragma endregion
         
     #pragma region ===== OPERATORS =====
 
