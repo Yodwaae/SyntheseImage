@@ -82,7 +82,7 @@ LightPower lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, c
         // Compute cosine of angle between surface normal and light direction
         double lightAngle = normal.dot(dirToLight);
 
-        // Compute attenuation (inverse-square law) and final light intensity
+        // Compute attenuation (inverse-square law) and finalg light intensity
         LightPower attenuation = light.power / lightDistanceSquared;
         LightPower lightIntensity = attenuation * lightAngle;
 
@@ -131,7 +131,7 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
             // Else set the color to background/missing texture
             if (hitSphere) {
                 LightPower lightIntensity = lightsIntersectSpheres(lights, ray, *hitSphere, spheres, dist);
-                colorValue = hitSphere->material.displayedColor(lightIntensity);
+                colorValue = hitSphere->material.displayedColor(lightIntensity) * 255;
                 colVec[y * WIDTH + x] = colorValue;
             }
             else
