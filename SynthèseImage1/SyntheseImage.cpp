@@ -283,19 +283,50 @@ using namespace std;
 
 #pragma region ========== COLOR CLASS ==========
 
-    #pragma region ===== FUNCTIONS =====
+    #pragma region ===== OPERATORS =====
 
+    #pragma region === ARITHMETIC OPERATORS ===
+
+    #pragma region PURE/VALUE OPERATORS
+
+    // COLOR + COLOR
+    Color Color::operator+(const Color& color) const {
+        Vector3 res = _vect + color.getVect();
+
+        return Color(res);
+    }
+
+    // COLOR * ALBEDO
     Color Color::operator*(const Albedo& albedo) const {
         Vector3 res = _vect * albedo.getVect();
 
         return Color(res);
     }
 
+    #pragma endregion
+
+    #pragma region IN PLACE OPERATORS
+
+
+    // TODO Problem is, the color isn't clamped when doing this
+    // IN PLACE COLOR + COLOR
+    Color Color::operator+=(const Color& color) {
+        _vect += color.getVect();
+
+        return *this;
+    }
+
+    #pragma endregion
+
+    // DEAD CODE
+    /*
     Color Color::operator*(const LightPower& lightPower) const {
         Vector3 res = _vect * lightPower.getVect();
 
         return Color(res);
-    }
+    }*/
+
+    #pragma endregion
 
     #pragma endregion
 
@@ -314,6 +345,8 @@ using namespace std;
 #pragma region ========== LIGHT POWER ==========
 
     #pragma region ===== OPERATORS =====
+    // DEAD CODE
+    /*
 
     // TODO Should I add a function inline Vector3 Vector3CRTP::MULTIPLY(const Vector3CRTP& other) instead of writing _vect * other.getVect(); every time ? Or is just a bit redundant ?
     LightPower LightPower::operator+(const LightPower& other) const {
@@ -343,6 +376,7 @@ using namespace std;
 
         return res;
     }
+    */
 
     #pragma endregion
 

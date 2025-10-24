@@ -64,12 +64,12 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
 }
 
 // TODO Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
-LightPower lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const Sphere& hitSphere, const vector<Sphere>& spheres, double intersectDistance) {
+Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const Sphere& hitSphere, const vector<Sphere>& spheres, double intersectDistance) {
 
     // Initialisation
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
     NormalisedDirection normal = hitSphere.center.NormalisedDirectionTo(intersectionPoint);
-    LightPower agglomeratedLight = LightPower(0, 0, 0);
+    Color agglomeratedLightColor = Color(0, 0, 0);
 
     for (const Light& light : lights) {
 
@@ -83,8 +83,8 @@ LightPower lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, c
         double lightAngle = normal.dot(dirToLight);
 
         // Compute attenuation (inverse-square law) and finalg light intensity
-        LightPower attenuation = light.power / lightDistanceSquared;
-        LightPower lightIntensity = attenuation * lightAngle;
+        double attenuation = light.power / lightDistanceSquared;
+        double lightIntensity = attenuation * lightAngle;
 
         // ===== SHADOWS =====
 
@@ -96,11 +96,12 @@ LightPower lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, c
         if (intersectDist * intersectDist < lightDistanceSquared)
             continue;
 
-        // Add the light to the total light
-        agglomeratedLight +=  lightIntensity;
+
+        // Add the light to the total light // TODO To change once the in place +op for color clamp correctly
+        agglomeratedLightColor = agglomeratedLightColor + hitSphere.material.displayedColor(light, lightIntensity);
     }
 
-    return agglomeratedLight;
+    return agglomeratedLightColor;
 }
 
 // REFACTO : Divide in multiple functions ? (cleaner but potentially more overhead OR I use static inline for the "helpers" functions ?)
@@ -130,8 +131,7 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
             // If a sphere is hit set the color based on material and light intensity
             // Else set the color to background/missing texture
             if (hitSphere) {
-                LightPower lightIntensity = lightsIntersectSpheres(lights, ray, *hitSphere, spheres, dist);
-                colorValue = hitSphere->material.displayedColor(lightIntensity) * 255;
+                Color colorValue = lightsIntersectSpheres(lights, ray, *hitSphere, spheres, dist);
                 colVec[y * WIDTH + x] = colorValue;
             }
             else

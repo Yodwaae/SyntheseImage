@@ -290,11 +290,17 @@ class Color : public Vector3CRTP<Color> {
 
 		#pragma region ===== OPERATORS =====
 
+		// COLOR + COLOR
+		Color operator+(const Color& color) const;
+
 		// COLOR * SURFACE ABSORPTION
 		Color operator*(const Albedo& albedo) const;
 
+		Color operator+=(const Color& color);
+
+		// DEAD CODE
 		// COLOR * LIGHT POWER
-		Color operator*(const LightPower& lightPower) const;
+		//Color operator*(const LightPower& lightPower) const;
 
 		#pragma endregion
 
@@ -318,7 +324,8 @@ class Albedo : public Vector3CRTP<Albedo> {
 
 };
 
-class LightPower : public Vector3CRTP<LightPower>{
+// DEAD CODE
+/*class LightPower : public Vector3CRTP<LightPower> {
 
 public:
 	INHERIT_CRTP_OPERATORS(LightPower)
@@ -352,7 +359,7 @@ public:
 
 	#pragma endregion
 
-};
+};*/
 
 #pragma endregion
 
@@ -379,8 +386,8 @@ inline Point operator+(const Direction& dir, const Point& point) {
 inline Color operator*(const Albedo& albedo, const Color& color) {
 	return color * albedo;
 }
-
-// LIGHT POWER * COLOR
+// DEAD CODE
+/*// LIGHT POWER * COLOR
 inline Color operator*(const LightPower& lightPower, const Color& color) {
 	return color * lightPower;
 }
@@ -388,6 +395,6 @@ inline Color operator*(const LightPower& lightPower, const Color& color) {
 // LIGHT POWER * ALBEDO
 inline Color operator*(const Albedo& albedo, const LightPower& lightPower) {
 	return lightPower * albedo;
-}
+}*/
 
 #pragma endregion
