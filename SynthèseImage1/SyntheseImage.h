@@ -6,6 +6,8 @@
 // Also no need for copy constructor as in that case the compiler created one will work just fine
 // NOTE : Commutative operator that impact two differents classes also have a function to reverse the expression allowing the operator to work both ways
 
+// TODO Harmonise the usage of other/nameOfTheClass in the operators args
+
 #pragma region ========== FORWARD DECLARATIONS ==========
 
 class Direction;
@@ -223,12 +225,21 @@ class Direction : public Vector3CRTP<Direction> {
 
 		#pragma endregion
 
+
+		// DIRECTION * NORMALISED DIRECTION
+		Direction operator*(const NormalisedDirection& other) const;
+
+		// DIRECTION + NORMALISED DIRECTION
+		Direction operator+(const NormalisedDirection& other) const;
+
 };
 
 // TODO Better than before but there's still problem of code duplication (not much), also might need to redefine operators so operation between normalisedDir send back a normalisedDir (to see if it's useful)
 class NormalisedDirection : public Direction {
 
 	public:
+		using Direction::operator*;
+		using Direction::operator/;
 
 		#pragma region ===== CONSTRUCTORS =====
 
@@ -263,6 +274,19 @@ class NormalisedDirection : public Direction {
 			if (len < EPSILON) return Vector3(0.0, 0.0, 0.0);
 			return vec / len;
 		}
+
+		#pragma endregion
+
+		#pragma region ===== OPERATORS =====
+
+		// NORMALISED DIRECTION * NORMALISED DIRECTION
+		NormalisedDirection operator*(const NormalisedDirection& other) const;
+
+		// NORMALISED DIRECTION * DIRECTION
+		Direction operator*(const Direction& other) const;
+
+		// NORMALISED DIRECTION + DIRECTION
+		Direction operator+(const Direction& other) const;
 
 		#pragma endregion
 };
@@ -319,6 +343,11 @@ class Albedo : public Vector3CRTP<Albedo> {
 
 		// CLAMPING
 		inline static double Clamp(const double scal) { return std::clamp(scal, 0.0, 1.0); }
+
+		// REFLECT
+		NormalisedDirection Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray);
+		
+		// REFRACT
 
 		#pragma endregion
 

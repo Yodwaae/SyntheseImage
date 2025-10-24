@@ -18,15 +18,15 @@ int main()
     // ===== SPHERES =====
 
     // Wall sphere (used to simulate a box
-    Sphere rightWallSphere{ Point(wallSphereRadius + WIDTH, HEIGHT/2, 0), wallSphereRadius, Material( Albedo(0, 1, 0)) };
-    Sphere leftWallSphere{ Point(-wallSphereRadius, HEIGHT/2, 0), wallSphereRadius, Material(Albedo(1, 0, 0)) };
-    Sphere upWallSphere{ Point(WIDTH/2, -wallSphereRadius, 0), wallSphereRadius, Material(Albedo(1, 1, 1)) };
-    Sphere downWallSphere{ Point(WIDTH/2, wallSphereRadius + HEIGHT, 0), wallSphereRadius, Material(Albedo(1, 1, 1)) };
-    Sphere backWallSphere{ Point(WIDTH/2, HEIGHT/2, DEPTH + wallSphereRadius), wallSphereRadius, Material(Albedo(1, 1, 1)) };
+    Sphere rightWallSphere{ Point(wallSphereRadius + WIDTH, HEIGHT/2, 0), wallSphereRadius, Material( Albedo(0, 1, 0), Diffuse) };
+    Sphere leftWallSphere{ Point(-wallSphereRadius, HEIGHT/2, 0), wallSphereRadius, Material(Albedo(1, 0, 0), Diffuse) };
+    Sphere upWallSphere{ Point(WIDTH/2, -wallSphereRadius, 0), wallSphereRadius, Material(Albedo(1, 1, 1), Diffuse) };
+    Sphere downWallSphere{ Point(WIDTH/2, wallSphereRadius + HEIGHT, 0), wallSphereRadius, Material(Albedo(1, 1, 1), Diffuse) };
+    Sphere backWallSphere{ Point(WIDTH/2, HEIGHT/2, DEPTH + wallSphereRadius), wallSphereRadius, Material(Albedo(1, 1, 1), Diffuse) };
     // Spheres creation
-    Sphere sphere1{ Point(150, 350, 250), 80, Material(Albedo(0, 0, 1))};
+    Sphere sphere1{ Point(150, 350, 250), 80, Material(Albedo(0, 0, 1), Diffuse)};
     Sphere sphere2{ Point(350, 350, 250), 80, Material() };
-    Sphere sphere3{ Point(250, 270, 410), 80, Material(Albedo(1, 1, 0)) };
+    Sphere sphere3{ Point(250, 270, 410), 80, Material(Albedo(1, 1, 0), Diffuse)};
     // Sphere vector
     vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2 };
 

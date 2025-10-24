@@ -76,35 +76,52 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
     NormalisedDirection normal = hitSphere.center.NormalisedDirectionTo(intersectionPoint);
     Color agglomeratedLightColor = Color(0, 0, 0);
 
-    for (const Light& light : lights) {
+    // TODO Comments and clean/opti once I implemented the others behavior
+    switch (hitSphere.material.getBehavior())
+    {
 
-        // ===== LIGHTS =====
+    case Diffuse:
+        for (const Light& light : lights) {
 
-        // Light loop initialisation (values for cosine and attenuation)
-        NormalisedDirection dirToLight = intersectionPoint.NormalisedDirectionTo(light.position);
-        double lightDistanceSquared = intersectionPoint.SquaredDistanceTo(light.position);
+            // ===== LIGHTS =====
 
-        // Compute cosine of angle between surface normal and light direction
-        double lightAngle = normal.dot(dirToLight);
+            // Light loop initialisation (values for cosine and attenuation)
+            NormalisedDirection dirToLight = intersectionPoint.NormalisedDirectionTo(light.position);
+            double lightDistanceSquared = intersectionPoint.SquaredDistanceTo(light.position);
 
-        // NOTE : Max is a security in case of a negative light (now that we add the lights), though I think the color clamping should be enough to avoid problem, so maybe I remove it to save some perfs ?
-        // Compute attenuation (inverse-square law) and finalg light intensity
-        double attenuation = max(0.0, light.power / lightDistanceSquared);
-        double lightIntensity = attenuation * lightAngle;
+            // Compute cosine of angle between surface normal and light direction
+            double lightAngle = normal.dot(dirToLight);
 
-        // ===== SHADOWS =====
+            // NOTE : Max is a security in case of a negative light (now that we add the lights), though I think the color clamping should be enough to avoid problem, so maybe I remove it to save some perfs ?
+            // Compute attenuation (inverse-square law) and finalg light intensity
+            double attenuation = max(0.0, light.power / lightDistanceSquared);
+            double lightIntensity = attenuation * lightAngle;
 
-        // Shadow loop initialisation
-        Ray shadowRay{ intersectionPoint + BIAS * dirToLight, dirToLight };
+            // ===== SHADOWS =====
 
-        // If a sphere was in between the light and the intersected sphere doesn't add it to the aglomerated light
-        auto [throwAway, intersectDist] = rayIntersectSpheres(shadowRay, spheres);
-        if (intersectDist * intersectDist < lightDistanceSquared)
-            continue;
+            // Shadow loop initialisation
+            Ray shadowRay{ intersectionPoint + BIAS * dirToLight, dirToLight };
+
+            // If a sphere was in between the light and the intersected sphere doesn't add it to the aglomerated light
+            auto [throwAway, intersectDist] = rayIntersectSpheres(shadowRay, spheres);
+            if (intersectDist * intersectDist < lightDistanceSquared)
+                continue;
 
 
-        // Add the light to the total light // TODO To change once the in place +op for color clamp correctly
-        agglomeratedLightColor = agglomeratedLightColor + hitSphere.material.displayedColor(light, lightIntensity);
+            // Add the light to the total light // TODO To change once the in place +op for color clamp correctly
+            agglomeratedLightColor = agglomeratedLightColor + hitSphere.material.displayedColor(light, lightIntensity);
+        }
+
+        break;
+
+    case Mirror:
+        break;
+
+    case Glass:
+        break;
+
+    default:
+        break;
     }
 
     return agglomeratedLightColor;

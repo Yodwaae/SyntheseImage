@@ -268,12 +268,41 @@ using namespace std;
 
     #pragma endregion
 
+    // DIRECTION + NORMALISED DIRECTION
+    Direction Direction::operator+(const NormalisedDirection& other) const {
+        Direction res = other.getVect() + _vect;
+
+        return res;
+    }
+
+    // DIRECTION * NORMALISED DIRECTION
+    Direction Direction::operator*(const NormalisedDirection& other) const {
+        Direction res = other.getVect() * _vect;
+
+        return res;
+    }
+
 #pragma endregion
 
 
 #pragma region ========== NORMALISED DIRECTION CLASS ==========
 
     #pragma region ===== FUNCTIONS =====
+
+    // NORMALISED DIRECTION * NORMALISED DIRECTION
+    NormalisedDirection NormalisedDirection::operator*(const NormalisedDirection& other) const {
+        Direction res = _vect * other.getVect();
+
+        return res.Normalise();
+    }
+
+    // NORMALISED DIRECTION * DIRECTION
+    Direction NormalisedDirection::operator*(const Direction& other) const {
+        Direction res = _vect * other.getVect();
+
+        return res;
+    }
+
 
     #pragma endregion
 
@@ -336,6 +365,18 @@ using namespace std;
 #pragma region ========== ALBEDO ==========
 
     #pragma region ===== FUNCTIONS =====
+
+    // TODO : This should be in material class
+    // TODO I need to clean this up
+    NormalisedDirection Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray) {
+        NormalisedDirection projection = - normal.dot(ray);
+
+        Direction reflectedRay = 2 * projection * normal + ray;
+        NormalisedDirection normalisedReflectedRay = reflectedRay.Normalise();
+
+        return normalisedReflectedRay;
+    }
+
 
       
     #pragma endregion

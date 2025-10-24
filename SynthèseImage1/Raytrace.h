@@ -10,8 +10,12 @@ using namespace std;
 // TODO : Wrap Sphere into a struct Object
 #pragma region ===== STRUCTURES =====
 
-// TODO Add the behavior (metal, glass, ...)
-// TODO Color might be a bit redundant but my refacto attempt prooved unsuccessful (If I succesfully remove color should I keep Material as a wrapper of albedo ? Or should I just use Albedo directly/rename it ?)
+enum Behavior {
+    Mirror,
+    Diffuse,
+    Glass,
+};
+
 
 struct Ray {
 
@@ -29,21 +33,25 @@ public:
     double power;
 };
 
-// TODO Should rename the class albedo to material and get rid of this material class
+// TODO Add the behavior (metal, glass, ...)
+// TODO Should rename the class albedo to material and get rid of this material class (Well not sure about that actually as the material also take into account the behavior)
 class Material {
 
 private:
     Albedo _albedo;
+    Behavior _behavior;
 
 public:
 
 #pragma region === CONSTRUCTORS ===
+    
+    // TODO : Do I add a constructor with only albedo that default behavior to diffuse ? Idem for only behavior ? (The first might be useful in some cases but the second one seems uselesss honestly)
 
     // Default
-    Material() : _albedo(1, 1, 1) {};
+    Material() : _albedo(1, 1, 1), _behavior(Diffuse) {};
 
     // Explicit
-    Material(const Albedo& albedo) : _albedo(albedo) {};
+    Material(const Albedo& albedo, Behavior behavior) : _albedo(albedo), _behavior(behavior) {};
 
 #pragma endregion
 
@@ -55,6 +63,10 @@ public:
         Color res = light.color * _albedo * intensity;
 
         return res;
+    }
+
+    Behavior getBehavior() const {
+        return _behavior;
     }
 
 #pragma endregion
