@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include <tuple>
 #include <stdexcept>
 #include <fstream>
@@ -34,21 +35,25 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
         double radius = sphere.radius;
         Point center = sphere.center;
         Point origin = ray.origin;
-        Direction direction = ray.direction;
+        NormalisedDirection direction = ray.direction;
 
         //Initialisation
         Direction oc = origin.DirectionTo(center);
         double r2 = radius * radius;
 
         // Setting the 3 terms of que equation system
-        double a = direction.dot(direction);
-        double b = -2 * direction.dot(oc);
+        // NOTE : Removed A from the calculations as the dot of a normal direction is 1, a is always a factor and a factor of 1 is neutral in mults (a = direction.dot(direction))
+        double b = - direction.dot(oc);
         double c = oc.dot(oc) - r2;
 
-        // Solving the system
-        double delta = (b * b) - (4 * a * c);
-        double t0 = (-b - sqrt(delta)) / (2 * a);
-        double t1 = (-b + sqrt(delta)) / (2 * a);
+        // Solving delta
+        // NOTE : avoid doing delta sqrt 2 times (although compiler might already optimise that)
+        double delta = (b * b) - c;
+        double sqrtDelta = sqrt(delta); 
+
+        // Finding the solution of the system
+        double t0 = (-b - sqrtDelta);
+        double t1 = (-b + sqrtDelta);
 
         if (t0 >= 0) intersectionDist = t0;
         else if (t1 >= 0) intersectionDist = t1;
@@ -82,8 +87,9 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
         // Compute cosine of angle between surface normal and light direction
         double lightAngle = normal.dot(dirToLight);
 
+        // NOTE : Max is a security in case of a negative light (now that we add the lights), though I think the color clamping should be enough to avoid problem, so maybe I remove it to save some perfs ?
         // Compute attenuation (inverse-square law) and finalg light intensity
-        double attenuation = light.power / lightDistanceSquared;
+        double attenuation = max(0.0, light.power / lightDistanceSquared);
         double lightIntensity = attenuation * lightAngle;
 
         // ===== SHADOWS =====
