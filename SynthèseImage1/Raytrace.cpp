@@ -109,7 +109,7 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
 
 
             // Add the light to the total light // TODO To change once the in place +op for color clamp correctly
-            agglomeratedLightColor = agglomeratedLightColor + hitSphere.material.displayedColor(light, lightIntensity);
+            agglomeratedLightColor = agglomeratedLightColor + light.color.displayedColor(hitSphere.material.getAlbedo(), lightIntensity);
         }
 
         break;
@@ -154,7 +154,7 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
             // If a sphere is hit set the color based on material and light intensity
             // Else set the color to background/missing texture
             if (hitSphere) {
-                Color colorValue = lightsIntersectSpheres(lights, ray, *hitSphere, spheres, dist);
+                colorValue = lightsIntersectSpheres(lights, ray, *hitSphere, spheres, dist);
                 colVec[y * WIDTH + x] = colorValue;
             }
             else

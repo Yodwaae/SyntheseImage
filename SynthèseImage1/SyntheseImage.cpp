@@ -312,6 +312,20 @@ using namespace std;
 
 #pragma region ========== COLOR CLASS ==========
 
+
+    // TODO COMMENT + CLEAN UP
+    Color Color::displayedColor(const Albedo& albedo, const double lightIntensity) const {
+
+        Color normalisedColor = _vect / 255;
+
+        Color colorRes = normalisedColor * albedo * lightIntensity;
+
+        Vector3 res = Vector3(pow(colorRes.getA(), GAMMA_CORRECTION), pow(colorRes.getB(), GAMMA_CORRECTION), pow(colorRes.getC(), GAMMA_CORRECTION));
+
+        return res * 255;
+    }
+
+
     #pragma region ===== OPERATORS =====
 
     #pragma region === ARITHMETIC OPERATORS ===

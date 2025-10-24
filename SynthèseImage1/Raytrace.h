@@ -27,10 +27,10 @@ struct Ray {
 
 struct Light {
 
-public:
-    Point position;
-    Color color;
-    double power;
+    public:
+        Point position;
+        Color color;
+        double power;
 };
 
 // TODO Add the behavior (metal, glass, ...)
@@ -57,17 +57,13 @@ public:
 
 #pragma region === FUNCTIONS ===
 
-    Color displayedColor(const Light& light, const double intensity) const {
+    #pragma region GETTERS
 
-        // Apply the gamma correction and the albedo to the material color // TODO Re add the gamma correction
-        Color res = light.color * _albedo * intensity;
+    inline Behavior getBehavior() const { return _behavior; }
 
-        return res;
-    }
+    inline Albedo getAlbedo() const { return _albedo; }
 
-    Behavior getBehavior() const {
-        return _behavior;
-    }
+    #pragma endregion
 
 #pragma endregion
 

@@ -309,6 +309,9 @@ class Color : public Vector3CRTP<Color> {
 
 		// CLAMPING
 		inline static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
+		
+		// TODO
+		Color displayedColor(const Albedo& albedo, const double lightIntensity) const;
 
 		#pragma endregion
 
@@ -319,6 +322,7 @@ class Color : public Vector3CRTP<Color> {
 
 		// COLOR * SURFACE ABSORPTION
 		Color operator*(const Albedo& albedo) const;
+
 
 		Color operator+=(const Color& color);
 
