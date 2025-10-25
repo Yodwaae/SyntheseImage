@@ -108,8 +108,8 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
                 continue;
 
 
-            // Add the light to the total light // TODO To change once the in place +op for color clamp correctly
-            agglomeratedLightColor = agglomeratedLightColor + light.color.displayedColor(hitSphere.material.getAlbedo(), lightIntensity);
+            // Add the light to the total light
+            agglomeratedLightColor += light.color.ComputeDiffuseColor(hitSphere.material.getAlbedo(), lightIntensity);
         }
 
         break;
@@ -124,6 +124,7 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
         break;
     }
 
+    //cout << agglomeratedLightColor.getA() << " " << agglomeratedLightColor.getB() << " " << agglomeratedLightColor.getC();
     return agglomeratedLightColor;
 }
 
@@ -185,8 +186,10 @@ int writeImage(const string& filename, int width, int height, const vector<Color
         for (int j = 0; j < width; j++) {
 
             int index = i * width + j;
-            Color color = vec[index];
-            out << color.getRed() << " " << color.getGreen() << " " << color.getBlue() << " ";
+            //Color color = vec[index]; // TO OPTI I don't know which approach is better
+            //out << color.getRed() << " " << color.getGreen() << " " << color.getBlue() << " ";
+
+            out << vec[index].getRed() << " " << vec[index].getGreen() << " " << vec[index].getBlue() << " ";
 
         }
 

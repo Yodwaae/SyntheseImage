@@ -2,10 +2,13 @@
 #include <iostream>
 #include <algorithm>
 
+using namespace std;
+
 // NOTE : For all classes, the Vect3 will be stored as value and not pointer as it is a lightweight object, simpler and safer
 // Also no need for copy constructor as in that case the compiler created one will work just fine
 // NOTE : Commutative operator that impact two differents classes also have a function to reverse the expression allowing the operator to work both ways
 
+// TODO Should maje a pass to check which function don't need to be cons (like gammaCorrection, computeDiffuseColor, ...)
 // TODO Harmonise the usage of other/nameOfTheClass in the operators args
 
 #pragma region ========== FORWARD DECLARATIONS ==========
@@ -35,8 +38,6 @@ constexpr double GAMMA_CORRECTION = 1 / 2.2;
 
 
 #pragma region ========== CLASSES ==========
-
-
 
 class Vector3 {
 	// NOTE Non symmetrical operators are not working both ways by design as Vector3 should not be use outside the CRTP wrapper
@@ -103,9 +104,15 @@ class Vector3 {
 		double lengthSquared() const;
 		bool isZero() const;
 
+		// GETTERS
 		double getA() const { return _a; }
 		double getB() const { return _b; }
 		double getC() const { return _c; }
+
+		// SETTERS //TODO To see if I keep them (useful in the color case (tolinear tosrgb)
+		void setA(double value) { _a = value; }
+		void setB(double value) { _b = value; }
+		void setC(double value) { _c = value; }
 
 
 		#pragma endregion
@@ -113,8 +120,6 @@ class Vector3 {
 	private:
 
 		double _a, _b, _c;
-
-
 };
 
 template <typename T>
@@ -163,20 +168,25 @@ class Vector3CRTP {
 			return ApplyPolicy(Vector3(x, y, z));
 		}
 
+		// NOTE : Do not create overhead as they are inlined by the compiler
+		// GETTERS
+		const Vector3& getVect() const { return _vect; }
+		double getA() const { return _vect.getA(); }
+		double getB() const { return _vect.getB(); }
+		double getC() const { return _vect.getC(); }
 
 		const double dot(const Vector3CRTP<T>& other) const { return _vect.dot(other._vect); }
-
-		// NOTE : Do not create overhead as they are inlined by the compiler
-		const Vector3& getVect() const { return _vect; }
-		const double getA() const { return _vect.getA(); }
-		const double getB() const { return _vect.getB(); }
-		const double getC() const { return _vect.getC(); }
 
 		#pragma endregion
 
 	protected:
 
 		Vector3 _vect;
+
+		// SETTERS
+		void setA(double value) { _vect.setA(value); }
+		void setB(double value) { _vect.setB(value); }
+		void setC(double value) { _vect.setC(value); }
 
 };
 
@@ -292,6 +302,7 @@ class NormalisedDirection : public Direction {
 };
 
 class Color : public Vector3CRTP<Color> {
+	// NOTE : Color is created as a sRGB then immediately converted to linear space for the PBR calculations and it's converted back to sRGB just before display
 
 	public :
 		INHERIT_CRTP_OPERATORS(Color);
@@ -304,18 +315,29 @@ class Color : public Vector3CRTP<Color> {
 		const double getGreen() const { return getB(); }
 		const double getBlue() const{ return getC(); }
 
-		// POLICY
-		inline static double Policy(const double scal) { return Clamp(scal); }
+		// POLICY (convert to linear space)
+		inline static double Policy(const double scal) { return SRGBClamp(scal); }
 
-		// CLAMPING
-		inline static double Clamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
-		
-		// TODO
-		Color displayedColor(const Albedo& albedo, const double lightIntensity) const;
+		// SRGB CLAMPING (0 to 255)
+		inline static double SRGBClamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
+
+		//
+		Color ComputeDiffuseColor(const Albedo& albedo, const double lightIntensity) const;
+
+		//
+		void GammaCorrection() {
+			setA(pow(getA(), GAMMA_CORRECTION));
+			setB(pow(getB(), GAMMA_CORRECTION));
+			setC(pow(getC(), GAMMA_CORRECTION));
+		}
 
 		#pragma endregion
 
 		#pragma region ===== OPERATORS =====
+
+		#pragma region === ARITHMETIC OPERATORS ===
+
+		#pragma region PURE/VALUE OPERATORS
 
 		// COLOR + COLOR
 		Color operator+(const Color& color) const;
@@ -323,14 +345,19 @@ class Color : public Vector3CRTP<Color> {
 		// COLOR * SURFACE ABSORPTION
 		Color operator*(const Albedo& albedo) const;
 
+		#pragma region IN PLACE OPERATORS
 
-		Color operator+=(const Color& color);
-
-		// DEAD CODE
-		// COLOR * LIGHT POWER
-		//Color operator*(const LightPower& lightPower) const;
+		// IN PLACE COLOR + COLOR
+		void operator+=(const Color& color);
 
 		#pragma endregion
+
+		#pragma endregion
+
+		#pragma endregion
+
+		#pragma endregion
+
 
 };
 
@@ -357,43 +384,6 @@ class Albedo : public Vector3CRTP<Albedo> {
 
 };
 
-// DEAD CODE
-/*class LightPower : public Vector3CRTP<LightPower> {
-
-public:
-	INHERIT_CRTP_OPERATORS(LightPower)
-	using Vector3CRTP<LightPower>::Vector3CRTP;
-
-	#pragma region ===== OPERATORS =====
-
-	#pragma region === ARITHMETIC OPERATORS ===
-
-	#pragma region PURE/VALUE OPERATORS
-	
-	// ADDING LIGHTS
-	LightPower operator+(const LightPower& other) const;
-
-	Color operator*(const Albedo& other) const;
-
-	#pragma region IN PLACE OPERATORS
-
-	LightPower operator+=(const LightPower& other);
-
-	#pragma endregion
-
-
-	#pragma region ===== FUNCTIONS =====
-
-	// POLICY
-	inline static double Policy(const double scal) { return scal; }
-	
-	// GAMMA CORRECTION
-	LightPower GammaCorrection() const;
-
-	#pragma endregion
-
-};*/
-
 #pragma endregion
 
 #pragma region =========== NON-MEMBER OPERATORS ==========
@@ -419,15 +409,5 @@ inline Point operator+(const Direction& dir, const Point& point) {
 inline Color operator*(const Albedo& albedo, const Color& color) {
 	return color * albedo;
 }
-// DEAD CODE
-/*// LIGHT POWER * COLOR
-inline Color operator*(const LightPower& lightPower, const Color& color) {
-	return color * lightPower;
-}
-
-// LIGHT POWER * ALBEDO
-inline Color operator*(const Albedo& albedo, const LightPower& lightPower) {
-	return lightPower * albedo;
-}*/
 
 #pragma endregion

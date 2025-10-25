@@ -314,15 +314,14 @@ using namespace std;
 
 
     // TODO COMMENT + CLEAN UP
-    Color Color::displayedColor(const Albedo& albedo, const double lightIntensity) const {
+    Color Color::ComputeDiffuseColor(const Albedo& albedo, const double lightIntensity) const {
 
-        Color normalisedColor = _vect / 255;
+        Color res = _vect;
 
-        Color colorRes = normalisedColor * albedo * lightIntensity;
+        res = res * albedo * lightIntensity;
+        //res.GammaCorrection();
 
-        Vector3 res = Vector3(pow(colorRes.getA(), GAMMA_CORRECTION), pow(colorRes.getB(), GAMMA_CORRECTION), pow(colorRes.getC(), GAMMA_CORRECTION));
-
-        return res * 255;
+        return res;
     }
 
 
@@ -350,24 +349,13 @@ using namespace std;
 
     #pragma region IN PLACE OPERATORS
 
-
-    // TODO Problem is, the color isn't clamped when doing this
     // IN PLACE COLOR + COLOR
-    Color Color::operator+=(const Color& color) {
-        _vect += color.getVect();
-
-        return *this;
+    void Color::operator+=(const Color& color) {
+        // TODO Absolutely horrendous but I'm tired
+        _vect = Vector3(min(255.0, color.getRed()+ getRed()), min(255.0, color.getGreen() + getGreen()), min(255.0, color.getBlue() + getBlue()));
     }
 
     #pragma endregion
-
-    // DEAD CODE
-    /*
-    Color Color::operator*(const LightPower& lightPower) const {
-        Vector3 res = _vect * lightPower.getVect();
-
-        return Color(res);
-    }*/
 
     #pragma endregion
 
@@ -393,46 +381,6 @@ using namespace std;
 
 
       
-    #pragma endregion
-
-#pragma endregion
-
-#pragma region ========== LIGHT POWER ==========
-
-    #pragma region ===== OPERATORS =====
-    // DEAD CODE
-    /*
-
-    // TODO Should I add a function inline Vector3 Vector3CRTP::MULTIPLY(const Vector3CRTP& other) instead of writing _vect * other.getVect(); every time ? Or is just a bit redundant ?
-    LightPower LightPower::operator+(const LightPower& other) const {
-        LightPower res = _vect + other.getVect();
-
-        return res;
-    }
-
-    Color LightPower::operator*(const Albedo& other) const {
-        Color res = _vect * other.getVect();
-
-        return res;
-    }
-
-    LightPower LightPower::operator+=(const LightPower& other) {
-        LightPower res = _vect += other.getVect();
-
-        return res;
-    }
-
-    #pragma endregion
-
-    #pragma region ===== FUNCTIONS =====
-
-    LightPower LightPower::GammaCorrection() const {
-        LightPower res = Vector3(pow(getA(), GAMMA_CORRECTION), pow(getB(), GAMMA_CORRECTION), pow(getC(), GAMMA_CORRECTION));
-
-        return res;
-    }
-    */
-
     #pragma endregion
 
 #pragma endregion
