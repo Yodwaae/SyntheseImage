@@ -12,13 +12,13 @@ using namespace std;
 
 #pragma region ========== VECTOR3 CLASS ==========
         
-    #pragma region ===== OPERATORS =====
+#pragma region ===== OPERATORS =====
 
-    #pragma region === ARITHMETIC OPERATORS ===
+#pragma region === ARITHMETIC OPERATORS ===
 
     //HINT : If dividing by 0 will not crash but instead return +inf/-inf or NaN depending on the case
 
-    #pragma region PURE/VALUE OPERATORS
+#pragma region PURE/VALUE OPERATORS
 
     // ADDITION
     Vector3 Vector3::operator+(const Vector3& other) const {
@@ -75,9 +75,9 @@ using namespace std;
         return Vector3(newA, newB, newC);
     }
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma region IN PLACE OPERATORS
+#pragma region IN PLACE OPERATORS
 
     // IN PLACE ADDITION
     Vector3& Vector3::operator+=(const Vector3& other){
@@ -133,9 +133,11 @@ using namespace std;
         return *this;
     }
 
-    #pragma endregion
+#pragma endregion
 
-    # pragma endregion
+# pragma endregion
+
+#pragma region === COMPARISON OPERATORS ===
 
     // EQUAL COMPARISON
     bool Vector3::operator==(const Vector3& other) const {
@@ -152,9 +154,11 @@ using namespace std;
         return !(*this == other);
     }
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma region ===== FUNCTIONS =====
+#pragma endregion
+
+#pragma region ===== FUNCTIONS =====
 
     double Vector3::dot(const Vector3& other) const{
 
@@ -196,14 +200,14 @@ using namespace std;
         return false;
     }
 
-    #pragma endregion
+#pragma endregion
 
 #pragma endregion
 
 
 #pragma region ========== POINT CLASS ==========
 
-    #pragma region ===== OPERATORS =====
+#pragma region ===== OPERATORS =====
 
     // POINT + DIRECTION
     Point Point::operator+(const Direction& other) const{
@@ -219,9 +223,9 @@ using namespace std;
         return Point(res);
     }
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
     
     // DIRECTION TO
     Direction Point::DirectionTo(const Point& other) const {
@@ -251,14 +255,14 @@ using namespace std;
         return res;
     }
 
-    #pragma endregion
+#pragma endregion
 
 #pragma endregion
 
 
 #pragma region ========== DIRECTION CLASS ==========
 
-    #pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
     NormalisedDirection Direction::Normalise() const {
         NormalisedDirection res = NormalisedDirection(_vect);
@@ -266,7 +270,9 @@ using namespace std;
         return res;
     }
 
-    #pragma endregion
+#pragma endregion
+
+#pragma region ===== OPERATORS =====
 
     // DIRECTION + NORMALISED DIRECTION
     Direction Direction::operator+(const NormalisedDirection& other) const {
@@ -284,10 +290,12 @@ using namespace std;
 
 #pragma endregion
 
+#pragma endregion
+
 
 #pragma region ========== NORMALISED DIRECTION CLASS ==========
 
-    #pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
     // NORMALISED DIRECTION * NORMALISED DIRECTION
     NormalisedDirection NormalisedDirection::operator*(const NormalisedDirection& other) const {
@@ -303,74 +311,76 @@ using namespace std;
         return res;
     }
 
-
-    #pragma endregion
-
+#pragma endregion
 
 #pragma endregion
 
 
 #pragma region ========== COLOR CLASS ==========
 
+#pragma region ===== FUNCTIONS =====
 
-    // TODO COMMENT + CLEAN UP
-    Color Color::ComputeDiffuseColor(const Albedo& albedo, const double lightIntensity) const {
+    Color Color::computeDiffuseColor(const Albedo& albedo, const double lightIntensity) const {
 
+        // Create a copy of the color
         Color res = _vect;
 
-        res = res * albedo * lightIntensity;
-        //res.GammaCorrection();
+        // Convert to linear space, those the light calculation and gamma correction then convertr back to sRGB
+        res = res.toLinear() * albedo * lightIntensity;
+        res.gammaCorrection().toSRGB();
 
         return res;
     }
 
+#pragma endregion
 
-    #pragma region ===== OPERATORS =====
+#pragma region ===== OPERATORS =====
 
-    #pragma region === ARITHMETIC OPERATORS ===
+#pragma region === ARITHMETIC OPERATORS ===
 
-    #pragma region PURE/VALUE OPERATORS
+#pragma region PURE/VALUE OPERATORS
 
     // COLOR + COLOR
     Color Color::operator+(const Color& color) const {
-        Vector3 res = _vect + color.getVect();
+        Color res = _vect + color.getVect();
 
-        return Color(res);
+        return res;
     }
 
     // COLOR * ALBEDO
     Color Color::operator*(const Albedo& albedo) const {
-        Vector3 res = _vect * albedo.getVect();
+        Color res = _vect * albedo.getVect();
 
-        return Color(res);
+        return res;
     }
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma region IN PLACE OPERATORS
+#pragma region IN PLACE OPERATORS
 
     // IN PLACE COLOR + COLOR
-    void Color::operator+=(const Color& color) {
-        // TODO Absolutely horrendous but I'm tired
-        _vect = Vector3(min(255.0, color.getRed()+ getRed()), min(255.0, color.getGreen() + getGreen()), min(255.0, color.getBlue() + getBlue()));
+    Color& Color::operator+=(const Color& color) {
+        _vect += color.getVect();
+        sRGBClamp();
+
+        return *this;
     }
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma endregion
+#pragma endregion
 
-    #pragma endregion
+#pragma endregion
 
 #pragma endregion
 
 
 #pragma region ========== ALBEDO ==========
 
-    #pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
-    // TODO : This should be in material class
     // TODO I need to clean this up
-    NormalisedDirection Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray) {
+    NormalisedDirection Albedo::reflect(const NormalisedDirection& normal, const NormalisedDirection& ray) {
         NormalisedDirection projection = - normal.dot(ray);
 
         Direction reflectedRay = 2 * projection * normal + ray;
@@ -378,9 +388,7 @@ using namespace std;
 
         return normalisedReflectedRay;
     }
-
-
       
-    #pragma endregion
+#pragma endregion
 
 #pragma endregion

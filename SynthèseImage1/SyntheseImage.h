@@ -8,7 +8,7 @@ using namespace std;
 // Also no need for copy constructor as in that case the compiler created one will work just fine
 // NOTE : Commutative operator that impact two differents classes also have a function to reverse the expression allowing the operator to work both ways
 
-// TODO Should maje a pass to check which function don't need to be cons (like gammaCorrection, computeDiffuseColor, ...)
+// TODO Should make a pass to check which function don't need to be const (like gammaCorrection, computeDiffuseColor, ...)
 // TODO Harmonise the usage of other/nameOfTheClass in the operators args
 
 #pragma region ========== FORWARD DECLARATIONS ==========
@@ -26,7 +26,7 @@ class LightPower;
 #pragma region ========== GLOBALS ==========
 
 static constexpr double EPSILON = 1e-9;
-constexpr double GAMMA_CORRECTION = 1 / 2.2;
+constexpr double GAMMA_CORRECTION = 1.0 / 2.2;
 
 
 // TODO Not a huge fan of this approach by macro see a better solution that allows do define new operator in crtp derived classes without overwritting the sale ioeratir with differents signatures
@@ -43,7 +43,7 @@ class Vector3 {
 	// NOTE Non symmetrical operators are not working both ways by design as Vector3 should not be use outside the CRTP wrapper
 	public:
 
-		#pragma region ===== CONSTRUCTORS =====
+	#pragma region ===== CONSTRUCTORS =====
 			
 			// Default
 			Vector3() : _a(0), _b(0), _c(0) {}
@@ -57,13 +57,13 @@ class Vector3 {
 			// Explicit (NOTE :Shouldn't be used anymore but for the moment I keep it as it can be used during debug/temp integration of a feature
 			Vector3(double x, double y, double z) :_a(x), _b(y), _c(z) {}
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma region ===== OPERATORS =====
+#pragma region ===== OPERATORS =====
 
-		#pragma region === ARITHMETIC OPERATORS ===
+#pragma region === ARITHMETIC OPERATORS ===
 
-		#pragma region PURE/VALUE OPERATORS
+#pragma region PURE/VALUE OPERATORS
 
 		Vector3 operator+(const Vector3& other) const;
 		Vector3 operator-(const Vector3& other) const;
@@ -74,9 +74,9 @@ class Vector3 {
 		Vector3 operator/(const double amount) const;
 		Vector3 operator*(const double amount) const;
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma region IN PLACE OPERATORS
+#pragma region IN PLACE OPERATORS
 
 		Vector3& operator+=(const Vector3& other);
 		Vector3& operator-=(const Vector3& other);
@@ -87,16 +87,16 @@ class Vector3 {
 		Vector3& operator*=(const double amount);
 		Vector3& operator/=(const double amount);
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma endregion
+#pragma endregion
 
 		bool operator==(const Vector3& other) const;
 		bool operator!=(const Vector3& other) const;
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
 		double dot(const Vector3& other) const;
 		double unsafeIndex(int i) const;
@@ -109,13 +109,13 @@ class Vector3 {
 		double getB() const { return _b; }
 		double getC() const { return _c; }
 
-		// SETTERS //TODO To see if I keep them (useful in the color case (tolinear tosrgb)
+		// SETTERS //TODO To see if I keep them (useful in the color class (clamp))
 		void setA(double value) { _a = value; }
 		void setB(double value) { _b = value; }
 		void setC(double value) { _c = value; }
 
 
-		#pragma endregion
+#pragma endregion
 
 	private:
 
@@ -127,9 +127,9 @@ class Vector3CRTP {
 
 	public:
 	
-		#pragma region ===== CONSTRUCTORS =====
-		// TODO Should others constructors be made explicit ? To keep an eye on
+#pragma region ===== CONSTRUCTORS =====
 
+		// TODO Should others constructors be made explicit ? To keep an eye on
 		// Default
 		Vector3CRTP(): _vect() {}
 
@@ -142,18 +142,18 @@ class Vector3CRTP {
 		 // Explicit
 		Vector3CRTP(double x, double y, double z): _vect(ApplyPolicy(x, y, z)) {}
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma region ===== OPERATORS =====
+#pragma region ===== OPERATORS =====
 		
 		// NOTE : Stay vigilant about the T return, should be safer but could cause error wuth the way the logic is implemented
 		// SCALAR
 		T operator*(const double amount) const { return T(_vect * amount); }
 		T operator/(const double amount) const { return T(_vect / amount); }
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
 		// POLICY
 		static double ApplyPolicy(double v) { return T::Policy(v); }
@@ -177,7 +177,7 @@ class Vector3CRTP {
 
 		const double dot(const Vector3CRTP<T>& other) const { return _vect.dot(other._vect); }
 
-		#pragma endregion
+#pragma endregion
 
 	protected:
 
@@ -196,15 +196,14 @@ class Point : public Vector3CRTP<Point> {
 		INHERIT_CRTP_OPERATORS(Point);
 		using Vector3CRTP<Point>::Vector3CRTP;
 
-		#pragma region ===== OPERATORS =====
+#pragma region ===== OPERATORS =====
 
 		Point operator+(const Direction& other) const;
 		Point operator-(const Direction& other) const; 
 
-		#pragma endregion
+#pragma endregion
 
-
-		#pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
 		// POLICY
 		inline static double Policy(const double scal) { return scal; }
@@ -215,7 +214,7 @@ class Point : public Vector3CRTP<Point> {
 		double DistanceTo(const Point& other) const;
 		double SquaredDistanceTo(const Point& other) const;
 
-		#pragma endregion
+#pragma endregion
 
 };
 
@@ -225,7 +224,7 @@ class Direction : public Vector3CRTP<Direction> {
 		INHERIT_CRTP_OPERATORS(Direction);
 		using Vector3CRTP<Direction>::Vector3CRTP;
 
-		#pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
 		// POLICY
 		inline static double Policy(const double scal) { return scal; }
@@ -233,14 +232,17 @@ class Direction : public Vector3CRTP<Direction> {
 		// NORMALISE
 		NormalisedDirection Normalise() const;
 
-		#pragma endregion
+#pragma endregion
 
+#pragma region ===== OPERATORS =====
 
 		// DIRECTION * NORMALISED DIRECTION
 		Direction operator*(const NormalisedDirection& other) const;
 
 		// DIRECTION + NORMALISED DIRECTION
 		Direction operator+(const NormalisedDirection& other) const;
+
+#pragma endregion
 
 };
 
@@ -251,7 +253,7 @@ class NormalisedDirection : public Direction {
 		using Direction::operator*;
 		using Direction::operator/;
 
-		#pragma region ===== CONSTRUCTORS =====
+#pragma region ===== CONSTRUCTORS =====
 
 		// OPTI If I keep this approach I'll compute the default normalisedDirection at compile time and store it as constexpr
 		// Default, normalise a (1, 1, 1) vector because a (0, 0, 0) can't be normalised as it's length will always be 0
@@ -266,9 +268,9 @@ class NormalisedDirection : public Direction {
 		// Explicit
 		NormalisedDirection(double x, double y, double z): Direction(Normalise(Vector3(x, y, z))) {}
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
 		// POLICY
 		inline static double Policy(const double scal) { return Normalise(Vector3(scal, scal, scal)).getA(); }
@@ -285,9 +287,9 @@ class NormalisedDirection : public Direction {
 			return vec / len;
 		}
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma region ===== OPERATORS =====
+#pragma region ===== OPERATORS =====
 
 		// NORMALISED DIRECTION * NORMALISED DIRECTION
 		NormalisedDirection operator*(const NormalisedDirection& other) const;
@@ -298,7 +300,7 @@ class NormalisedDirection : public Direction {
 		// NORMALISED DIRECTION + DIRECTION
 		Direction operator+(const Direction& other) const;
 
-		#pragma endregion
+#pragma endregion
 };
 
 class Color : public Vector3CRTP<Color> {
@@ -308,36 +310,63 @@ class Color : public Vector3CRTP<Color> {
 		INHERIT_CRTP_OPERATORS(Color);
 		using Vector3CRTP<Color>::Vector3CRTP;
 
-		#pragma region ===== FUNCTIONS =====
+#pragma region ===== FUNCTIONS =====
 
 		// GETTERS
 		const double getRed() const { return getA(); }
 		const double getGreen() const { return getB(); }
 		const double getBlue() const{ return getC(); }
 
-		// POLICY (convert to linear space)
-		inline static double Policy(const double scal) { return SRGBClamp(scal); }
+		// POLICY
+		inline static double Policy(const double scal) { return sRGBClamp(scal); }
 
-		// SRGB CLAMPING (0 to 255)
-		inline static double SRGBClamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
-
-		//
-		Color ComputeDiffuseColor(const Albedo& albedo, const double lightIntensity) const;
+		// CLAMPING (0 to 255)
+		inline static double sRGBClamp(const double scal) { return std::clamp(scal, 0.0, 255.0); }
 
 		//
-		void GammaCorrection() {
+		Color& sRGBClamp() { 
+			setA(sRGBClamp(getA()));
+			setB(sRGBClamp(getB()));
+			setC(sRGBClamp(getC()));
+
+			return *this; 
+		}
+
+#pragma region === LIGHTS CALCULATION ===
+
+		// COMPUTE DIFFUSE COLOR
+		Color computeDiffuseColor(const Albedo& albedo, const double lightIntensity) const;
+
+		// TO LINEAR
+		Color& toLinear() {
+			_vect /= 255;
+
+			return *this;
+		}
+
+		//TO sRGB
+		Color& toSRGB() { 
+			_vect *= 255; 
+
+			return *this;
+		}
+
+		// GAMMA CORRECTION
+		Color& gammaCorrection() {
 			setA(pow(getA(), GAMMA_CORRECTION));
 			setB(pow(getB(), GAMMA_CORRECTION));
 			setC(pow(getC(), GAMMA_CORRECTION));
+
+			return *this;
 		}
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma region ===== OPERATORS =====
+#pragma region ===== OPERATORS =====
 
-		#pragma region === ARITHMETIC OPERATORS ===
+#pragma region === ARITHMETIC OPERATORS ===
 
-		#pragma region PURE/VALUE OPERATORS
+#pragma region PURE/VALUE OPERATORS
 
 		// COLOR + COLOR
 		Color operator+(const Color& color) const;
@@ -345,42 +374,42 @@ class Color : public Vector3CRTP<Color> {
 		// COLOR * SURFACE ABSORPTION
 		Color operator*(const Albedo& albedo) const;
 
-		#pragma region IN PLACE OPERATORS
+#pragma region IN PLACE OPERATORS
 
 		// IN PLACE COLOR + COLOR
-		void operator+=(const Color& color);
+		Color& operator+=(const Color& color);
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma endregion
+#pragma endregion
 
-		#pragma endregion
-
+#pragma endregion
 
 };
 
 class Albedo : public Vector3CRTP<Albedo> {
-	
-	public:
-		using Vector3CRTP<Albedo>::Vector3CRTP;
-		INHERIT_CRTP_OPERATORS(Albedo)
 
-		#pragma region ===== FUNCTIONS =====
+public:
+	INHERIT_CRTP_OPERATORS(Albedo);
+	using Vector3CRTP<Albedo>::Vector3CRTP;
 
-		// POLICY
-		inline static double Policy(const double scal) {return Clamp(scal);}
 
-		// CLAMPING
-		inline static double Clamp(const double scal) { return std::clamp(scal, 0.0, 1.0); }
+	#pragma region ===== FUNCTIONS =====
 
-		// REFLECT
-		NormalisedDirection Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray);
-		
-		// REFRACT
+	// POLICY
+	inline static double Policy(const double scal) { return albedoClamp(scal); }
 
-		#pragma endregion
+	// CLAMPING
+	inline static double albedoClamp(const double scal) { return std::clamp(scal, 0.0, 1.0); }
+
+	// REFLECT
+	NormalisedDirection reflect(const NormalisedDirection& normal, const NormalisedDirection& ray);
+
+	// REFRACT
+
+	#pragma endregion
 
 };
 

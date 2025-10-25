@@ -34,7 +34,6 @@ struct Light {
 };
 
 // TODO Add the behavior (metal, glass, ...)
-// TODO Should rename the class albedo to material and get rid of this material class (Well not sure about that actually as the material also take into account the behavior)
 class Material {
 
 private:

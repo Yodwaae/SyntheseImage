@@ -33,8 +33,8 @@ int main()
     // ===== LIGHTS =====
 
     // Light creation
-    Light light1{ Point(250, 250, 0), Color(255, 255, 255), 30000};
-    Light light2{ Point(250, 250, 250), Color(255, 255, 255), 30000};
+    Light light1{ Point(250, 250, 0), Color(255, 255, 255), 3000};
+    Light light2{ Point(250, 250, 250), Color(255, 255, 255), 3000};
     // Light Vector
     vector<Light> lights = { light1, light2 };
 

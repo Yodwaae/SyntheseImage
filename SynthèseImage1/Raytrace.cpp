@@ -68,7 +68,7 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
     return make_tuple(hitSphere, nearestDist);
 }
 
-// TODO Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
+// TO OPTI Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
 Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const Sphere& hitSphere, const vector<Sphere>& spheres, double intersectDistance) {
 
     // Initialisation
@@ -109,7 +109,7 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
 
 
             // Add the light to the total light
-            agglomeratedLightColor += light.color.ComputeDiffuseColor(hitSphere.material.getAlbedo(), lightIntensity);
+            agglomeratedLightColor += light.color.computeDiffuseColor(hitSphere.material.getAlbedo(), lightIntensity);
         }
 
         break;
