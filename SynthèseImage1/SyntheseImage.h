@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <algorithm>
+#include <optional>
 
 using namespace std;
 
@@ -242,6 +243,9 @@ class Direction : public Vector3CRTP<Direction> {
 		// DIRECTION + NORMALISED DIRECTION
 		Direction operator+(const NormalisedDirection& other) const;
 
+		// DIRECTION - DIRECTION (used in refraction context)
+		Direction operator-(const Direction& other) const;
+
 #pragma endregion
 
 };
@@ -252,6 +256,7 @@ class NormalisedDirection : public Direction {
 	public:
 		using Direction::operator*;
 		using Direction::operator/;
+		using Direction::operator-;
 
 #pragma region ===== CONSTRUCTORS =====
 
@@ -402,9 +407,10 @@ public:
 	inline static double albedoClamp(const double scal) { return std::clamp(scal, 0.0, 1.0); }
 
 	// REFLECT
-	static NormalisedDirection Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray);
+	static NormalisedDirection Reflect(const NormalisedDirection& normal, const NormalisedDirection& rayDirection);
 
 	// REFRACT
+	static optional<NormalisedDirection> Refract(double ior, const NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside);
 
 	#pragma endregion
 

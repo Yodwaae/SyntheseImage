@@ -83,8 +83,6 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
     // Else a sphere is hit, set the color based on material and light intensity
 
     // Initialisation
-    NormalisedDirection reflectedDirection; // TO OPTI
-    Ray reflectedRay;
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
     NormalisedDirection normal = hitSphere->center.NormalisedDirectionTo(intersectionPoint);
     Color agglomeratedLightColor = Color(0, 0, 0);
@@ -93,7 +91,8 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
     switch (hitSphere->material.getBehavior())
     {
 
-    case Diffuse:
+    case Diffuse: {
+
         for (const Light& light : lights) {
 
             // ===== LIGHTS =====
@@ -125,19 +124,37 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
         }
 
         break;
+    }
 
-    case Mirror:
-
+    case Mirror: {
         // Get the reflected direction and create a nex ray with it 
-        reflectedDirection = Albedo::Reflect(normal, ray.direction);
-        reflectedRay = Ray{ray.origin + EPSILON * reflectedDirection, reflectedDirection}; // TODO Create a function that manages offsetting by espilon ?
+        NormalisedDirection reflectedDirection = Albedo::Reflect(normal, ray.direction);
+        Ray reflectedRay = Ray{ ray.origin + EPSILON * reflectedDirection, reflectedDirection }; // TODO Create a function that manages offsetting by espilon ?
 
         agglomeratedLightColor += lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor);
 
         break;
+    }
 
-    case Glass:
+    case Glass: {
+        // TODO Improve and clean up
+        // Get the reflected direction and create a nex ray with it 
+        double ior = 1.5; // TODO Add the IOR to the material
+        bool outside = false;
+
+        if (ray.direction.dot(normal) < 0)
+            outside = true;
+
+        optional<NormalisedDirection> maybeTransDir = Albedo::Refract(ior, normal, ray.direction, outside);
+
+        if (maybeTransDir){
+            NormalisedDirection transmittedDirection = maybeTransDir.value();
+            Ray transmittedRay = Ray{ ray.origin + EPSILON * transmittedDirection, transmittedDirection }; // TODO Create a function that manages offsetting by espilon ?
+            agglomeratedLightColor += lightsIntersectSpheres(lights, transmittedRay, spheres, backgroundColor);
+        }
+
         break;
+    }
 
     default:
         break;

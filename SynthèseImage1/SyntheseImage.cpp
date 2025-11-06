@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <optional>
 #include "SyntheseImage.h"
 #include "Raytrace.h"
 
@@ -288,6 +289,13 @@ using namespace std;
         return res;
     }
 
+    // DIRECTION - DIRECTION (used in refraction context)
+    Direction Direction::operator-(const Direction& other) const {
+        Direction res = other.getVect() - _vect;
+
+        return res;
+    }
+
 #pragma endregion
 
 #pragma endregion
@@ -380,15 +388,50 @@ using namespace std;
 #pragma region ===== FUNCTIONS =====
 
     // TODO I need to clean this up
-    NormalisedDirection Albedo::Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray) {
-        double projection = - normal.dot(ray);
+    NormalisedDirection Albedo::Reflect(const NormalisedDirection& normal, const NormalisedDirection& rayDirection) {
+        double projection = - normal.dot(rayDirection);
 
-        Direction reflectedRay = 2 * projection * normal + ray;
+        Direction reflectedRay = 2 * projection * normal + rayDirection;
         NormalisedDirection normalisedReflectedRay = reflectedRay.Normalise();
 
         return normalisedReflectedRay;
     }
 
+    // TODO I REALLY REALLY need to clean this up
+    // TODO In the future should return a tupple (coef, optional<normDir>)
+    optional<NormalisedDirection> Albedo::Refract(double ior, const NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside) {
+
+        // Initialisation
+        optional<NormalisedDirection> maybeTransDir;
+
+        // Compute the refraction angle
+        if (outside)
+            ior = 1 / ior;
+
+        double cosT1 = normal.dot(rayDirection);
+        double cosT2Squared = 1 - ((ior * ior) * (1 - (cosT1 * cosT1)));
+
+        if (cosT2Squared < 0)
+            return maybeTransDir;
+        else {
+
+            // Compute the transmitted Dir and add it to the optional
+            NormalisedDirection transmittedDirection = ((rayDirection * ior) - (normal * (cosT1 * ior + sqrt(cosT2Squared)))).Normalise();
+            maybeTransDir.emplace(transmittedDirection);
+
+            // Approximation of Fresnel coeff for the reflection
+            double r0 = pow(((ior - 1) / (ior + 1)), 2);
+
+            // cosTheta must be the angle toward the light
+            double cosTheta = 1 + cosT1;
+
+            //
+            double reflectedCoef = r0 + (1 - r0) + pow(cosTheta, 5);
+             
+            return maybeTransDir;
+        }
+
+    }
 
     #pragma endregion
 

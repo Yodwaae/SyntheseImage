@@ -25,7 +25,7 @@ int main()
     Sphere backWallSphere{ Point(WIDTH/2, HEIGHT/2, DEPTH + wallSphereRadius), wallSphereRadius, Material(Albedo(1, 1, 1), Diffuse) };
     // Spheres creation
     Sphere sphere1{ Point(150, 350, 250), 80, Material(Albedo(0, 0, 1), Mirror)};
-    Sphere sphere2{ Point(350, 350, 250), 80, Material() };
+    Sphere sphere2{ Point(350, 350, 250), 80, Material(Albedo(1, 1, 1), Glass)};
     Sphere sphere3{ Point(250, 270, 410), 80, Material(Albedo(1, 1, 0), Diffuse)};
     // Sphere vector
     vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2 };
