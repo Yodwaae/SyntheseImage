@@ -410,7 +410,7 @@ public:
 	static NormalisedDirection Reflect(const NormalisedDirection& normal, const NormalisedDirection& rayDirection);
 
 	// REFRACT
-	static optional<NormalisedDirection> Refract(double ior, NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside);
+	static tuple<float, optional<NormalisedDirection>> Refract(double ior, NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside);
 
 	#pragma endregion
 

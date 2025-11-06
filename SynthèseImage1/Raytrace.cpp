@@ -139,13 +139,13 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
     case Glass: {
         // TODO Improve and clean up
         // Get the reflected direction and create a nex ray with it 
-        double ior = 1.5; // TODO Add the IOR to the material
+        double ior = 2.4; // TODO Add the IOR to the material
         bool outside = false;
 
         if (ray.direction.dot(normal) < 0)
             outside = true;
 
-        optional<NormalisedDirection> maybeTransDir = Albedo::Refract(ior, normal, ray.direction, outside);
+        auto [coef,maybeTransDir] = Albedo::Refract(ior, normal, ray.direction, outside);
 
         if (!maybeTransDir) {
             // Get the reflected direction and create a nex ray with it 

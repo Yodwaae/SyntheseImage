@@ -399,7 +399,7 @@ using namespace std;
 
     // TODO I REALLY REALLY need to clean this up
     // TODO In the future should return a tupple (coef, optional<normDir>)
-    optional<NormalisedDirection> Albedo::Refract(double ior, NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside) {
+    tuple<float, optional<NormalisedDirection>> Albedo::Refract(double ior, NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside) {
 
         // Initialisation
         optional<NormalisedDirection> maybeTransDir;
@@ -414,7 +414,7 @@ using namespace std;
         double cosT2Squared = 1 - ((ior * ior) * (1 - (cosT1 * cosT1)));
 
         if (cosT2Squared < 0)
-            return maybeTransDir;
+            return make_tuple(0.f, maybeTransDir);
         else {
 
             // Compute the transmitted Dir and add it to the optional
@@ -434,7 +434,7 @@ using namespace std;
             //
             double reflectedCoef = r0 + (1 - r0) * pow(cosTheta, 5);
              
-            return maybeTransDir;
+            return make_tuple(reflectedCoef, maybeTransDir);
         }
 
     }
