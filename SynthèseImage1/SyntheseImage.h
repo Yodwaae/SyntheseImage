@@ -360,11 +360,8 @@ class Color : public Vector3CRTP<Color> {
 			return *this;
 		}
 
-#pragma endregion
-
 #pragma region ===== OPERATORS =====
 
-#pragma region === ARITHMETIC OPERATORS ===
 
 #pragma region PURE/VALUE OPERATORS
 
@@ -405,7 +402,7 @@ public:
 	inline static double albedoClamp(const double scal) { return std::clamp(scal, 0.0, 1.0); }
 
 	// REFLECT
-	NormalisedDirection reflect(const NormalisedDirection& normal, const NormalisedDirection& ray);
+	static NormalisedDirection Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray);
 
 	// REFRACT
 

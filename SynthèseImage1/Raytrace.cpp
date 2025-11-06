@@ -7,6 +7,7 @@
 #include <cmath>
 #include <optional>
 #include "Raytrace.h"
+#include "SyntheseImage.h"
 
 using namespace std;
 
@@ -68,16 +69,28 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
     return make_tuple(hitSphere, nearestDist);
 }
 
-// TO OPTI Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
-Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const Sphere& hitSphere, const vector<Sphere>& spheres, double intersectDistance) {
+// TODO Add an alpha (maybe directly in color)
+// TODO Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
+Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const vector<Sphere>& spheres, const Color& backgroundColor) {
+    // TODO Clean up the mess moving rayIntersectSpheres here created
+    // Sphere Intersection with Camera
+    auto [hitSphere, intersectDistance] = rayIntersectSpheres(ray, spheres);
+
+    // If no sphere are hit set the color to background/missing texture
+    if (hitSphere == nullptr) // TODO Do I still need a ptr here or could optionnal be better ?
+        return backgroundColor;
+
+    // Else a sphere is hit, set the color based on material and light intensity
 
     // Initialisation
+    NormalisedDirection reflectedDirection; // TO OPTI
+    Ray reflectedRay;
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
-    NormalisedDirection normal = hitSphere.center.NormalisedDirectionTo(intersectionPoint);
+    NormalisedDirection normal = hitSphere->center.NormalisedDirectionTo(intersectionPoint);
     Color agglomeratedLightColor = Color(0, 0, 0);
 
     // TODO Comments and clean/opti once I implemented the others behavior
-    switch (hitSphere.material.getBehavior())
+    switch (hitSphere->material.getBehavior())
     {
 
     case Diffuse:
@@ -107,14 +120,20 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
             if (intersectDist * intersectDist < lightDistanceSquared)
                 continue;
 
-
             // Add the light to the total light
-            agglomeratedLightColor += light.color.computeDiffuseColor(hitSphere.material.getAlbedo(), lightIntensity);
+            agglomeratedLightColor += light.color.computeDiffuseColor(hitSphere->material.getAlbedo(), lightIntensity);
         }
 
         break;
 
     case Mirror:
+
+        // Get the reflected direction and create a nex ray with it 
+        reflectedDirection = Albedo::Reflect(normal, ray.direction);
+        reflectedRay = Ray{ray.origin + EPSILON * reflectedDirection, reflectedDirection}; // TODO Create a function that manages offsetting by espilon ?
+
+        lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor);
+
         break;
 
     case Glass:
@@ -149,18 +168,9 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
             NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
             Ray ray{ pNearPlane, planeDistance };
             
-            // Sphere Intersection with Camera
-            auto [hitSphere, dist] = rayIntersectSpheres(ray, spheres);
 
-            // If a sphere is hit set the color based on material and light intensity
-            // Else set the color to background/missing texture
-            if (hitSphere) {
-                colorValue = lightsIntersectSpheres(lights, ray, *hitSphere, spheres, dist);
-                colVec[y * WIDTH + x] = colorValue;
-            }
-            else
-                colVec[y * WIDTH + x] = backgroundColor;
-        
+            colorValue = lightsIntersectSpheres(lights, ray, spheres, backgroundColor);
+            colVec[y * WIDTH + x] = colorValue;
         }
     }
 

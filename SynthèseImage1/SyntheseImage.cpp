@@ -380,7 +380,7 @@ using namespace std;
 #pragma region ===== FUNCTIONS =====
 
     // TODO I need to clean this up
-    NormalisedDirection Albedo::reflect(const NormalisedDirection& normal, const NormalisedDirection& ray) {
+    NormalisedDirection Albedo::Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray) {
         NormalisedDirection projection = - normal.dot(ray);
 
         Direction reflectedRay = 2 * projection * normal + ray;
@@ -388,7 +388,10 @@ using namespace std;
 
         return normalisedReflectedRay;
     }
-      
+
+
+    #pragma endregion
+
 #pragma endregion
 
 #pragma endregion
