@@ -89,7 +89,7 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
     NormalisedDirection normal = hitSphere->center.NormalisedDirectionTo(intersectionPoint);
     Color agglomeratedLightColor = Color(0, 0, 0);
 
-    // TODO Comments and clean/opti once I implemented the others behavior
+    // TODO Comments and clean/opti once I implemented the others behaviors
     switch (hitSphere->material.getBehavior())
     {
 
@@ -132,7 +132,7 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
         reflectedDirection = Albedo::Reflect(normal, ray.direction);
         reflectedRay = Ray{ray.origin + EPSILON * reflectedDirection, reflectedDirection}; // TODO Create a function that manages offsetting by espilon ?
 
-        lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor);
+        agglomeratedLightColor += lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor);
 
         break;
 

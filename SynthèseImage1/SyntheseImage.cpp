@@ -381,7 +381,7 @@ using namespace std;
 
     // TODO I need to clean this up
     NormalisedDirection Albedo::Reflect(const NormalisedDirection& normal, const NormalisedDirection& ray) {
-        NormalisedDirection projection = - normal.dot(ray);
+        double projection = - normal.dot(ray);
 
         Direction reflectedRay = 2 * projection * normal + ray;
         NormalisedDirection normalisedReflectedRay = reflectedRay.Normalise();
