@@ -399,14 +399,16 @@ using namespace std;
 
     // TODO I REALLY REALLY need to clean this up
     // TODO In the future should return a tupple (coef, optional<normDir>)
-    optional<NormalisedDirection> Albedo::Refract(double ior, const NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside) {
+    optional<NormalisedDirection> Albedo::Refract(double ior, NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside) {
 
         // Initialisation
         optional<NormalisedDirection> maybeTransDir;
 
         // Compute the refraction angle
-        if (outside)
-            ior = 1 / ior;
+        if (outside) {
+            ior = 1.0 / ior;
+            normal = (- 1 * normal).Normalise();
+        }
 
         double cosT1 = normal.dot(rayDirection);
         double cosT2Squared = 1 - ((ior * ior) * (1 - (cosT1 * cosT1)));
@@ -421,12 +423,16 @@ using namespace std;
 
             // Approximation of Fresnel coeff for the reflection
             double r0 = pow(((ior - 1) / (ior + 1)), 2);
+            double cosTheta = abs(transmittedDirection.dot(normal));
 
             // cosTheta must be the angle toward the light
-            double cosTheta = 1 + cosT1;
+            if (outside)
+                cosTheta = 1 + cosT1;
+
+            cosTheta = 1 - cosTheta;
 
             //
-            double reflectedCoef = r0 + (1 - r0) + pow(cosTheta, 5);
+            double reflectedCoef = r0 + (1 - r0) * pow(cosTheta, 5);
              
             return maybeTransDir;
         }

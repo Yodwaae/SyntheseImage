@@ -70,6 +70,7 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
 }
 
 // TODO Add an alpha (maybe directly in color)
+// // TODO Fix the duplication of mirror (in glass) + add a depth limit ?
 // TODO Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
 Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const vector<Sphere>& spheres, const Color& backgroundColor) {
     // TODO Clean up the mess moving rayIntersectSpheres here created
@@ -126,11 +127,10 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
         break;
     }
 
-    case Mirror: {
+    case Mirror: {  
         // Get the reflected direction and create a nex ray with it 
         NormalisedDirection reflectedDirection = Albedo::Reflect(normal, ray.direction);
-        Ray reflectedRay = Ray{ ray.origin + EPSILON * reflectedDirection, reflectedDirection }; // TODO Create a function that manages offsetting by espilon ?
-
+        Ray reflectedRay = Ray{ intersectionPoint + EPSILON * reflectedDirection, reflectedDirection }; // TODO Create a function that manages offsetting by espilon ?
         agglomeratedLightColor += lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor);
 
         break;
@@ -147,11 +147,18 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
 
         optional<NormalisedDirection> maybeTransDir = Albedo::Refract(ior, normal, ray.direction, outside);
 
-        if (maybeTransDir){
+        if (!maybeTransDir) {
+            // Get the reflected direction and create a nex ray with it 
+            NormalisedDirection reflectedDirection = Albedo::Reflect(normal, ray.direction);
+            Ray reflectedRay = Ray{ intersectionPoint + EPSILON * reflectedDirection, reflectedDirection }; // TODO Create a function that manages offsetting by espilon ?
+            agglomeratedLightColor += lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor);
+        }
+        if (maybeTransDir) {
             NormalisedDirection transmittedDirection = maybeTransDir.value();
-            Ray transmittedRay = Ray{ ray.origin + EPSILON * transmittedDirection, transmittedDirection }; // TODO Create a function that manages offsetting by espilon ?
+            Ray transmittedRay = Ray{ intersectionPoint + EPSILON * transmittedDirection, transmittedDirection }; // TODO Create a function that manages offsetting by espilon ?
             agglomeratedLightColor += lightsIntersectSpheres(lights, transmittedRay, spheres, backgroundColor);
         }
+
 
         break;
     }
