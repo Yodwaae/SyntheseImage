@@ -15,6 +15,7 @@ using namespace std;
 #pragma region ========== GLOBALS ==========
 
 static constexpr double BIAS = 0.1;
+static constexpr int MAX_DEPTH = 5;
 
 #pragma endregion
 
@@ -71,9 +72,15 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
 }
 
 // TODO Add an alpha (maybe directly in color)
-// // TODO Fix the duplication of mirror (in glass) + add a depth limit ?
+// TODO Fix the duplication of mirror (in glass) + add a depth limit ?
 // TODO Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
-Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const vector<Sphere>& spheres, const Color& backgroundColor) {
+// TODO There's no coeff taken into account
+Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const vector<Sphere>& spheres, const Color& backgroundColor, int depth) {
+
+    // RECURSION LIMIT
+    if (depth >= MAX_DEPTH)
+        return Color(0, 0, 0);
+
     // TODO Clean up the mess moving rayIntersectSpheres here created
     // Sphere Intersection with Camera
     auto [hitSphere, intersectDistance] = rayIntersectSpheres(ray, spheres);
@@ -96,6 +103,8 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
     case Diffuse: {
 
         for (const Light& light : lights) {
+
+            // ========== DIRECT LIGHTING ==========
 
             // ===== LIGHTS =====
 
@@ -121,8 +130,28 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
             if (intersectDist * intersectDist < lightDistanceSquared)
                 continue;
 
+            Color directLightContrib = light.color.computeDiffuseColor(hitSphere->material.getAlbedo(), lightIntensity);
+
+
+            // ========== INDIRECT LIGHTING ==========
+            // 
+            // Random dir for indirect light
+            double x = rand();
+            double y = rand();
+            double z = rand();
+
+            // Get the reflected direction and create a nex ray with it 
+            NormalisedDirection indirectDirection{ x, y, z };
+
+            if (!sameSide(normal, indirectDirection, ray.direction.flipDirection()))
+                indirectDirection = indirectDirection.flipDirection().Normalise();
+
+            Ray indirectRay = Ray{ intersectionPoint + EPSILON * indirectDirection, indirectDirection }; 
+            Color indirectLightContrib = lightsIntersectSpheres(lights, indirectRay, spheres, backgroundColor, depth + 1);
+
+
             // Add the light to the total light
-            agglomeratedLightColor += light.color.computeDiffuseColor(hitSphere->material.getAlbedo(), lightIntensity);
+            agglomeratedLightColor += (directLightContrib + indirectLightContrib)/2; // TODO Shouldn't be divided by two but instead use the coef (not yet implemented)
         }
 
         break;
@@ -132,7 +161,7 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
         // Get the reflected direction and create a nex ray with it 
         NormalisedDirection reflectedDirection = Albedo::Reflect(normal, ray.direction);
         Ray reflectedRay = Ray{ intersectionPoint + EPSILON * reflectedDirection, reflectedDirection }; // TODO Create a function that manages offsetting by espilon ?
-        agglomeratedLightColor += lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor);
+        agglomeratedLightColor += lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor, depth + 1);
 
         break;
     }
@@ -152,12 +181,12 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
             // Get the reflected direction and create a nex ray with it 
             NormalisedDirection reflectedDirection = Albedo::Reflect(normal, ray.direction);
             Ray reflectedRay = Ray{ intersectionPoint + EPSILON * reflectedDirection, reflectedDirection }; // TODO Create a function that manages offsetting by espilon ?
-            agglomeratedLightColor += lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor);
+            agglomeratedLightColor += lightsIntersectSpheres(lights, reflectedRay, spheres, backgroundColor, depth + 1);
         }
         if (maybeTransDir) {
             NormalisedDirection transmittedDirection = maybeTransDir.value();
             Ray transmittedRay = Ray{ intersectionPoint + EPSILON * transmittedDirection, transmittedDirection }; // TODO Create a function that manages offsetting by espilon ?
-            agglomeratedLightColor += lightsIntersectSpheres(lights, transmittedRay, spheres, backgroundColor);
+            agglomeratedLightColor += lightsIntersectSpheres(lights, transmittedRay, spheres, backgroundColor, depth + 1);
         }
 
 
@@ -179,7 +208,7 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
     vector<Color> colVec(WIDTH * HEIGHT);
     double verticalOffset = HEIGHT / 2;
     double horizontalOffset = WIDTH / 2;
-    int nbSamples = 5;
+    int nbSamples = 4;
 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
@@ -189,9 +218,9 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
             // Sampling
             for (int i = 0; i < nbSamples; i++) {
 
-                // Random delta for the ray for the sampling
-                double dx = (rand() / (double)RAND_MAX) - 0.5;
-                double dy = (rand() / (double)RAND_MAX) - 0.5;
+                // Random delta for the ray for the sampling (anti-aliasing)
+                double dx = ((rand() / (double)RAND_MAX) - 0.5);
+                double dy = ((rand() / (double)RAND_MAX) - 0.5);
 
                 // Compute the ray direction for this pixel in camera space
                 Point pNearPlane = Point(x + dx, y + dy, 0);
@@ -199,7 +228,7 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
                 Point pFarPlane = Point((x + dx - verticalOffset) * cameraOpening, (y + dy - horizontalOffset) * cameraOpening, 1);
                 NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
                 Ray ray{ pNearPlane, planeDistance };
-                colorValue += lightsIntersectSpheres(lights, ray, spheres, backgroundColor) * (1.0 / nbSamples);
+                colorValue += lightsIntersectSpheres(lights, ray, spheres, backgroundColor, 0) * (1.0 / nbSamples);
 
             }
                 
@@ -245,5 +274,7 @@ int writeImage(const string& filename, int width, int height, const vector<Color
     out.close();
     return 0;
 }
+
+bool sameSide(NormalisedDirection normal, Direction vector1, Direction vector2) { return (normal.dot(vector1) * normal.dot(vector2) > 0); }
 
 #pragma endregion

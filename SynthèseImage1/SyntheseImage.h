@@ -233,6 +233,9 @@ class Direction : public Vector3CRTP<Direction> {
 		// NORMALISE
 		NormalisedDirection Normalise() const;
 
+		// FLIP DIRECTION
+		Direction flipDirection() const;
+
 #pragma endregion
 
 #pragma region ===== OPERATORS =====

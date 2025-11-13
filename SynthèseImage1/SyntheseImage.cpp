@@ -271,6 +271,12 @@ using namespace std;
         return res;
     }
 
+    Direction Direction::flipDirection() const {
+        Direction res = _vect * -1;
+
+        return res;
+    }
+
 #pragma endregion
 
 #pragma region ===== OPERATORS =====
