@@ -23,18 +23,19 @@ int main()
     Sphere upWallSphere{ Point(WIDTH/2, -wallSphereRadius, 0), wallSphereRadius, Material(Albedo(1, 1, 1), Diffuse) };
     Sphere downWallSphere{ Point(WIDTH/2, wallSphereRadius + HEIGHT, 0), wallSphereRadius, Material(Albedo(1, 1, 1), Diffuse) };
     Sphere backWallSphere{ Point(WIDTH/2, HEIGHT/2, DEPTH + wallSphereRadius), wallSphereRadius, Material(Albedo(1, 1, 1), Diffuse) };
+    Sphere frontWallSphere{ Point(WIDTH/2, HEIGHT/2, -wallSphereRadius), wallSphereRadius, Material(Albedo(1, 1, 1), Diffuse) };
     // Spheres creation
     Sphere sphere1{ Point(150, 350, 250), 80, Material(Albedo(0, 0, 1), Mirror)};
     Sphere sphere2{ Point(350, 350, 250), 80, Material(Albedo(1, 1, 1), Glass)};
     Sphere sphere3{ Point(250, 270, 410), 80, Material(Albedo(1, 1, 0), Diffuse)};
     // Sphere vector
-    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, sphere1, sphere2 };
+    vector<Sphere> spheres = { rightWallSphere, leftWallSphere, upWallSphere, downWallSphere, backWallSphere, frontWallSphere, sphere1, sphere2 };
 
     // ===== LIGHTS =====
 
     // Light creation
-    Light light1{ Point(250, 250, 0), Color(255, 255, 255), 3000};
-    Light light2{ Point(250, 250, 250), Color(255, 255, 255), 3000};
+    Light light1{ Point(250, 250, 0), Color(255, 255, 255), 10000};
+    Light light2{ Point(250, 250, 250), Color(255, 255, 255), 10000};
     // Light Vector
     vector<Light> lights = { light1, light2 };
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 #include <algorithm>
 #include <tuple>
 #include <stdexcept>
@@ -139,10 +140,10 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
     case Glass: {
         // TODO Improve and clean up
         // Get the reflected direction and create a nex ray with it 
-        double ior = 2.4; // TODO Add the IOR to the material
+        double ior = 1.5; // TODO Add the IOR to the material
         bool outside = false;
 
-        if (ray.direction.dot(normal) < 0)
+        if (ray.direction.dot(normal) < 0) //TODO Move to the refract function
             outside = true;
 
         auto [coef,maybeTransDir] = Albedo::Refract(ior, normal, ray.direction, outside);
@@ -167,7 +168,6 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
         break;
     }
 
-    //cout << agglomeratedLightColor.getA() << " " << agglomeratedLightColor.getB() << " " << agglomeratedLightColor.getC();
     return agglomeratedLightColor;
 }
 
@@ -177,23 +177,33 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
     // Initialisation
     // TODO Better way to manage the camera offset ?
     vector<Color> colVec(WIDTH * HEIGHT);
-    double verticalOffset = WIDTH / 2;
-    double horizontalOffset = HEIGHT / 2;
+    double verticalOffset = HEIGHT / 2;
+    double horizontalOffset = WIDTH / 2;
+    int nbSamples = 5;
 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
             // Loop initialisation
-            Color colorValue = backgroundColor;
+            Color colorValue = Color(0, 0, 0); // TODO Change Implementation so that background color works with my appraoch
 
-            // Compute the ray direction for this pixel in camera space
-            Point pNearPlane = Point(x, y, 0);
-            Point pNearPlanePrime = Point(x - verticalOffset, y - horizontalOffset, 0);
-            Point pFarPlane = Point((x - verticalOffset) * cameraOpening, (y - horizontalOffset) * cameraOpening, 1);
-            NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
-            Ray ray{ pNearPlane, planeDistance };
-            
+            // Sampling
+            for (int i = 0; i < nbSamples; i++) {
 
-            colorValue = lightsIntersectSpheres(lights, ray, spheres, backgroundColor);
+                // Random delta for the ray for the sampling
+                double dx = (rand() / (double)RAND_MAX) - 0.5;
+                double dy = (rand() / (double)RAND_MAX) - 0.5;
+
+                // Compute the ray direction for this pixel in camera space
+                Point pNearPlane = Point(x + dx, y + dy, 0);
+                Point pNearPlanePrime = Point(x + dx - verticalOffset, y + dy - horizontalOffset, 0);
+                Point pFarPlane = Point((x + dx - verticalOffset) * cameraOpening, (y + dy - horizontalOffset) * cameraOpening, 1);
+                NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
+                Ray ray{ pNearPlane, planeDistance };
+                colorValue += lightsIntersectSpheres(lights, ray, spheres, backgroundColor) * (1.0 / nbSamples);
+
+            }
+                
+            // Normalise the result based on the sampling
             colVec[y * WIDTH + x] = colorValue;
         }
     }
