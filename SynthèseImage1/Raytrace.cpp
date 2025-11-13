@@ -87,7 +87,7 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
 
     // If no sphere are hit set the color to background/missing texture
     if (hitSphere == nullptr) // TODO Do I still need a ptr here or could optionnal be better ?
-        return backgroundColor;
+        return Color(0, 0, 0);
 
     // Else a sphere is hit, set the color based on material and light intensity
 
@@ -140,18 +140,26 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
             double y = rand();
             double z = rand();
 
+            double pi = acos(-1.0);
+            double phi = 2 * pi * x;
+            double sqrtY = sqrt(y);
+            double theta = acos(sqrt(y));
+            double sqrtOneMinusY = sqrt(1 - y);
+
             // Get the reflected direction and create a nex ray with it 
-            NormalisedDirection indirectDirection{ x, y, z };
+            //NormalisedDirection indirectDirection{ cos(phi - sqrtOneMinusY), sin(phi - sqrtOneMinusY), sqrtY};
+            NormalisedDirection indirectDirection{ x, y, z};
 
             if (!sameSide(normal, indirectDirection, ray.direction.flipDirection()))
                 indirectDirection = indirectDirection.flipDirection().Normalise();
 
+            double pdf = 1;
+            double indirectCoef = indirectDirection.dot(normal / pi) / pdf;
             Ray indirectRay = Ray{ intersectionPoint + EPSILON * indirectDirection, indirectDirection }; 
-            Color indirectLightContrib = lightsIntersectSpheres(lights, indirectRay, spheres, backgroundColor, depth + 1);
-
+            Color indirectLightContrib = lightsIntersectSpheres(lights, indirectRay, spheres, backgroundColor, depth + 1) * indirectCoef;
 
             // Add the light to the total light
-            agglomeratedLightColor += (directLightContrib + indirectLightContrib)/2; // TODO Shouldn't be divided by two but instead use the coef (not yet implemented)
+            agglomeratedLightColor += directLightContrib +indirectLightContrib; // TODO Should implement coef instead of arbitrarily choosing
         }
 
         break;
