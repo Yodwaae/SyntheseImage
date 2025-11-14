@@ -14,7 +14,7 @@ using namespace std;
 
 #pragma region ========== GLOBALS ==========
 
-static constexpr double BIAS = 0.1;
+static constexpr double BIAS = 1e-4;
 static constexpr int MAX_DEPTH = 5;
 
 #pragma endregion
@@ -126,9 +126,12 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
             Ray shadowRay{ intersectionPoint + BIAS * dirToLight, dirToLight };
 
             // If a sphere was in between the light and the intersected sphere doesn't add it to the aglomerated light
-            auto [throwAway, intersectDist] = rayIntersectSpheres(shadowRay, spheres);
-            if (intersectDist * intersectDist < lightDistanceSquared)
-                continue;
+            if (depth < 1) {
+                auto [throwAway, intersectDist] = rayIntersectSpheres(shadowRay, spheres);
+                if (intersectDist * intersectDist < lightDistanceSquared)
+                    continue;
+            }
+ 
 
             Color directLightContrib = light.color.computeDiffuseColor(hitSphere->material.getAlbedo(), lightIntensity);
 
@@ -153,7 +156,7 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
             if (!sameSide(normal, indirectDirection, ray.direction.flipDirection()))
                 indirectDirection = indirectDirection.flipDirection().Normalise();
 
-            double pdf = 1;
+            double pdf = 1.0 / 100.0 *100.0;
             double indirectCoef = indirectDirection.dot(normal / pi) / pdf;
             Ray indirectRay = Ray{ intersectionPoint + EPSILON * indirectDirection, indirectDirection }; 
             Color indirectLightContrib = lightsIntersectSpheres(lights, indirectRay, spheres, backgroundColor, depth + 1) * indirectCoef;
