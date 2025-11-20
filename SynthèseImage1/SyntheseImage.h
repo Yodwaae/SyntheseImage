@@ -9,9 +9,6 @@ using namespace std;
 // Also no need for copy constructor as in that case the compiler created one will work just fine
 // NOTE : Commutative operator that impact two differents classes also have a function to reverse the expression allowing the operator to work both ways
 
-// TODO Should make a pass to check which function don't need to be const (like gammaCorrection, computeDiffuseColor, ...)
-// TODO Harmonise the usage of other/nameOfTheClass in the operators args
-
 #pragma region ========== FORWARD DECLARATIONS ==========
 
 class Direction;
@@ -43,13 +40,13 @@ class Vector3 {
 	// NOTE Non symmetrical operators are not working both ways by design as Vector3 should not be use outside the CRTP wrapper
 	public:
 
-	#pragma region ===== CONSTRUCTORS =====
+#pragma region ===== CONSTRUCTORS =====
 			
 			// Default
 			Vector3() : _a(0), _b(0), _c(0) {}
 
 			// From scalar
-			Vector3(double scal) : _a(scal), _b(scal), _c(scal) {}
+			explicit Vector3(double scal) : _a(scal), _b(scal), _c(scal) {}
 
 			// Copy constructor (declared just for clarity sake as it's only a value copy, compiler created one would have worked just fine)
 			Vector3(const Vector3& other) : _a(other._a), _b(other._b), _c(other._c) {}
@@ -129,7 +126,6 @@ class Vector3CRTP {
 	
 #pragma region ===== CONSTRUCTORS =====
 
-		// TODO Should others constructors be made explicit ? To keep an eye on
 		// Default
 		Vector3CRTP(): _vect() {}
 
@@ -137,7 +133,7 @@ class Vector3CRTP {
 		explicit Vector3CRTP(double scal): _vect(ApplyPolicy(scal)) {}
 
 		// From Vec3
-		Vector3CRTP(const Vector3& vec) : _vect(ApplyPolicy(vec)) {}
+		explicit Vector3CRTP(const Vector3& vec) : _vect(ApplyPolicy(vec)) {}
 
 		 // Explicit
 		Vector3CRTP(double x, double y, double z): _vect(ApplyPolicy(x, y, z)) {}
@@ -156,7 +152,7 @@ class Vector3CRTP {
 #pragma region ===== FUNCTIONS =====
 
 		// POLICY
-		static double ApplyPolicy(double v) { return T::Policy(v); }
+		static double ApplyPolicy(double value) { return T::Policy(value); }
 
 		static Vector3 ApplyPolicy(const Vector3& vec) {
 			return Vector3(T::Policy(vec.getA()),
@@ -198,8 +194,8 @@ class Point : public Vector3CRTP<Point> {
 
 #pragma region ===== OPERATORS =====
 
-		Point operator+(const Direction& other) const;
-		Point operator-(const Direction& other) const; 
+		Point operator+(const Direction& direction) const;
+		Point operator-(const Direction& direction) const; 
 
 #pragma endregion
 
@@ -240,10 +236,10 @@ class Direction : public Vector3CRTP<Direction> {
 #pragma region ===== OPERATORS =====
 
 		// DIRECTION * NORMALISED DIRECTION
-		Direction operator*(const NormalisedDirection& other) const;
+		Direction operator*(const NormalisedDirection& normDir) const;
 
 		// DIRECTION + NORMALISED DIRECTION
-		Direction operator+(const NormalisedDirection& other) const;
+		Direction operator+(const NormalisedDirection& normDir) const;
 
 		// DIRECTION - DIRECTION (used in refraction context)
 		Direction operator-(const Direction& other) const;
@@ -267,10 +263,10 @@ class NormalisedDirection : public Direction {
 		NormalisedDirection(): Direction(Normalise(Vector3(1, 1, 1))) {}
 
 		// From Scalar
-		NormalisedDirection(double scal): Direction(Normalise(Vector3(scal, scal, scal))) {}
+		explicit NormalisedDirection(double scal): Direction(Normalise(Vector3(scal, scal, scal))) {}
 
 		// From Vec3
-		NormalisedDirection(const Vector3& vec) : Direction(Normalise(vec)) {}
+		explicit NormalisedDirection(const Vector3& vec) : Direction(Normalise(vec)) {}
 
 		// Explicit
 		NormalisedDirection(double x, double y, double z): Direction(Normalise(Vector3(x, y, z))) {}
@@ -302,10 +298,10 @@ class NormalisedDirection : public Direction {
 		NormalisedDirection operator*(const NormalisedDirection& other) const;
 
 		// NORMALISED DIRECTION * DIRECTION
-		Direction operator*(const Direction& other) const;
+		Direction operator*(const Direction& direction) const;
 
 		// NORMALISED DIRECTION + DIRECTION
-		Direction operator+(const Direction& other) const;
+		Direction operator+(const Direction& direction) const;
 
 #pragma endregion
 };

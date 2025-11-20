@@ -211,15 +211,15 @@ using namespace std;
 #pragma region ===== OPERATORS =====
 
     // POINT + DIRECTION
-    Point Point::operator+(const Direction& other) const{
-        Vector3 res = _vect + other.getVect();
+    Point Point::operator+(const Direction& direction) const{
+        Vector3 res = _vect + direction.getVect();
 
         return Point(res);
     }
 
     // POINT - DIRECTION
-    Point Point::operator-(const Direction& other) const{
-        Vector3 res = _vect - other.getVect();
+    Point Point::operator-(const Direction& direction) const{
+        Vector3 res = _vect - direction.getVect();
 
         return Point(res);
     }
@@ -230,7 +230,7 @@ using namespace std;
     
     // DIRECTION TO
     Direction Point::DirectionTo(const Point& other) const {
-        Direction res = other._vect - _vect;
+        Direction res = Direction(other._vect - _vect);
 
         return res;
     }
@@ -272,7 +272,7 @@ using namespace std;
     }
 
     Direction Direction::flipDirection() const {
-        Direction res = _vect * -1;
+        Direction res = Direction(_vect * -1);
 
         return res;
     }
@@ -282,22 +282,22 @@ using namespace std;
 #pragma region ===== OPERATORS =====
 
     // DIRECTION + NORMALISED DIRECTION
-    Direction Direction::operator+(const NormalisedDirection& other) const {
-        Direction res = other.getVect() + _vect;
+    Direction Direction::operator+(const NormalisedDirection& normDir) const {
+        Direction res = Direction(normDir.getVect() + _vect);
 
         return res;
     }
 
     // DIRECTION * NORMALISED DIRECTION
-    Direction Direction::operator*(const NormalisedDirection& other) const {
-        Direction res = other.getVect() * _vect;
+    Direction Direction::operator*(const NormalisedDirection& normDir) const {
+        Direction res = Direction(normDir.getVect() * _vect);
 
         return res;
     }
 
     // DIRECTION - DIRECTION (used in refraction context)
     Direction Direction::operator-(const Direction& other) const {
-        Direction res = other.getVect() - _vect;
+        Direction res = Direction(other.getVect() - _vect);
 
         return res;
     }
@@ -309,18 +309,25 @@ using namespace std;
 
 #pragma region ========== NORMALISED DIRECTION CLASS ==========
 
-#pragma region ===== FUNCTIONS =====
+#pragma region ===== OPERATORS =====
 
     // NORMALISED DIRECTION * NORMALISED DIRECTION
     NormalisedDirection NormalisedDirection::operator*(const NormalisedDirection& other) const {
-        Direction res = _vect * other.getVect();
+        Direction res = Direction(_vect * other.getVect());
 
         return res.Normalise();
     }
 
     // NORMALISED DIRECTION * DIRECTION
-    Direction NormalisedDirection::operator*(const Direction& other) const {
-        Direction res = _vect * other.getVect();
+    Direction NormalisedDirection::operator*(const Direction& direction) const {
+        Direction res = Direction(_vect * direction.getVect());
+
+        return res;
+    }
+
+    // NORMALISED DIRECTION + DIRECTION
+    Direction NormalisedDirection::operator+(const Direction& direction) const {
+        Direction res = Direction(_vect + direction.getVect());
 
         return res;
     }
@@ -337,7 +344,7 @@ using namespace std;
     Color Color::computeDiffuseColor(const Albedo& albedo, const double lightIntensity) const {
 
         // Create a copy of the color
-        Color res = _vect;
+        Color res = Color(_vect);
 
         // Convert to linear space, those the light calculation and gamma correction then convertr back to sRGB
         res = res.toLinear() * albedo * lightIntensity;
@@ -355,15 +362,15 @@ using namespace std;
 #pragma region PURE/VALUE OPERATORS
 
     // COLOR + COLOR
-    Color Color::operator+(const Color& color) const {
-        Color res = _vect + color.getVect();
+    Color Color::operator+(const Color& other) const {
+        Color res = Color(_vect + other.getVect());
 
         return res;
     }
 
     // COLOR * ALBEDO
     Color Color::operator*(const Albedo& albedo) const {
-        Color res = _vect * albedo.getVect();
+        Color res = Color(_vect * albedo.getVect());
 
         return res;
     }
@@ -373,8 +380,8 @@ using namespace std;
 #pragma region IN PLACE OPERATORS
 
     // IN PLACE COLOR + COLOR
-    Color& Color::operator+=(const Color& color) {
-        _vect += color.getVect();
+    Color& Color::operator+=(const Color& other) {
+        _vect += other.getVect();
         sRGBClamp();
 
         return *this;
@@ -393,7 +400,7 @@ using namespace std;
 
 #pragma region ===== FUNCTIONS =====
 
-    // TODO I need to clean this up
+    // TODO I need to clean this up and comment
     NormalisedDirection Albedo::Reflect(const NormalisedDirection& normal, const NormalisedDirection& rayDirection) {
         double projection = - normal.dot(rayDirection);
 
@@ -403,8 +410,7 @@ using namespace std;
         return normalisedReflectedRay;
     }
 
-    // TODO I REALLY REALLY need to clean this up
-    // TODO In the future should return a tupple (coef, optional<normDir>)
+    // TODO I REALLY REALLY need to clean this up and comment
     tuple<float, optional<NormalisedDirection>> Albedo::Refract(double ior, NormalisedDirection& normal, const NormalisedDirection& rayDirection, bool outside) {
 
         // Initialisation
@@ -445,8 +451,7 @@ using namespace std;
 
     }
 
-    #pragma endregion
-
 #pragma endregion
 
 #pragma endregion
+
