@@ -16,6 +16,9 @@ using namespace std;
 
 static constexpr double BIAS = 1e-4;
 static constexpr int MAX_DEPTH = 5;
+static constexpr int SAMPLES = 16;
+static const double PI = acos(-1.0);
+
 
 #pragma endregion
 
@@ -72,26 +75,21 @@ tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sp
 }
 
 // TODO Add an alpha (maybe directly in color)
-// TODO Fix the duplication of mirror (in glass) + add a depth limit ?
-// TODO Actually not tracing two times as light -> point is more of a geometric computation, but still should see if I could fold that to point -> light tracing
-// TODO There's no coeff taken into account
+// TODO Fix the duplication of mirror (in glass)
 Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const vector<Sphere>& spheres, const Color& backgroundColor, int depth) {
 
     // RECURSION LIMIT
     if (depth >= MAX_DEPTH)
         return Color(0, 0, 0);
 
-    // TODO Clean up the mess moving rayIntersectSpheres here created
-    // Sphere Intersection with Camera
+    // Sphere Intersection with Camera, if no sphere are hit set the color to background/missing texture and early return
     auto [hitSphere, intersectDistance] = rayIntersectSpheres(ray, spheres);
-
-    // If no sphere are hit set the color to background/missing texture
     if (hitSphere == nullptr) // TODO Do I still need a ptr here or could optionnal be better ?
         return Color(0, 0, 0);
 
-    // Else a sphere is hit, set the color based on material and light intensity
 
     // Initialisation
+    double shadowFactor = .2;
     Point intersectionPoint = ray.origin + (ray.direction * intersectDistance);
     NormalisedDirection normal = hitSphere->center.NormalisedDirectionTo(intersectionPoint);
     Color agglomeratedLightColor = Color(0, 0, 0);
@@ -129,41 +127,42 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
             if (depth < 1) {
                 auto [throwAway, intersectDist] = rayIntersectSpheres(shadowRay, spheres);
                 if (intersectDist * intersectDist < lightDistanceSquared)
-                    continue;
+                    lightIntensity *= shadowFactor;
             }
- 
 
+            // Add the direct light to the total light
             Color directLightContrib = light.color.computeDiffuseColor(hitSphere->material.getAlbedo(), lightIntensity);
-
-
-            // ========== INDIRECT LIGHTING ==========
-            // 
-            // Random dir for indirect light
-            double x = rand();
-            double y = rand();
-            double z = rand();
-
-            double pi = acos(-1.0);
-            double phi = 2 * pi * x;
-            double sqrtY = sqrt(y);
-            double theta = acos(sqrt(y));
-            double sqrtOneMinusY = sqrt(1 - y);
-
-            // Get the reflected direction and create a nex ray with it 
-            //NormalisedDirection indirectDirection{ cos(phi - sqrtOneMinusY), sin(phi - sqrtOneMinusY), sqrtY};
-            NormalisedDirection indirectDirection{ x, y, z};
-
-            if (!sameSide(normal, indirectDirection, ray.direction.flipDirection()))
-                indirectDirection = indirectDirection.flipDirection().Normalise();
-
-            double pdf = 1.0 / 100.0 *100.0;
-            double indirectCoef = indirectDirection.dot(normal / pi) / pdf;
-            Ray indirectRay = Ray{ intersectionPoint + EPSILON * indirectDirection, indirectDirection }; 
-            Color indirectLightContrib = lightsIntersectSpheres(lights, indirectRay, spheres, backgroundColor, depth + 1) * indirectCoef;
-
-            // Add the light to the total light
-            agglomeratedLightColor += directLightContrib +indirectLightContrib; // TODO Should implement coef instead of arbitrarily choosing
+            agglomeratedLightColor += directLightContrib;
         }
+
+
+        // ========== INDIRECT LIGHTING ==========
+
+        // Cosine-weighted hemisphere sampling
+        double x = rand() / double(RAND_MAX);
+        double y = rand() / double(RAND_MAX);
+
+        // Generate cosine-weighted direction in tangent space
+        double phi = 2.0 * PI * x;
+        double sqrtY = sqrt(y);
+        double sqrtOneMinusY = sqrt(1.0 - y);
+
+        NormalisedDirection indirectDirection{ cos(phi) * sqrtOneMinusY, sin(phi) * sqrtOneMinusY, sqrtY };
+
+        if (!sameSide(normal, indirectDirection, ray.direction.flipDirection()))
+            indirectDirection = indirectDirection.flipDirection().Normalise();
+
+        double cosTheta = max(0.0, indirectDirection.dot(normal));
+
+
+        double pdf = sqrtY / PI;
+        double indirectCoef = cosTheta / (PI * pdf);
+        Ray indirectRay = Ray{ intersectionPoint + EPSILON * indirectDirection, indirectDirection };
+
+
+        // Add the direct light to the total light
+        Color indirectLightContrib = lightsIntersectSpheres(lights, indirectRay, spheres, backgroundColor, depth + 1) * indirectCoef;
+        agglomeratedLightColor += indirectLightContrib;
 
         break;
     }
@@ -212,14 +211,11 @@ Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const 
 }
 
 // REFACTO : Divide in multiple functions ? (cleaner but potentially more overhead OR I use static inline for the "helpers" functions ?)
-vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor) {
+vector<Color> computeSpheresIntersect(int camPosX, int camPosY, const vector<Light>& lights, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor) {
     
     // Initialisation
-    // TODO Better way to manage the camera offset ?
     vector<Color> colVec(WIDTH * HEIGHT);
-    double verticalOffset = HEIGHT / 2;
-    double horizontalOffset = WIDTH / 2;
-    int nbSamples = 4;
+    int nbSamples = SAMPLES;
 
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
@@ -235,15 +231,15 @@ vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<
 
                 // Compute the ray direction for this pixel in camera space
                 Point pNearPlane = Point(x + dx, y + dy, 0);
-                Point pNearPlanePrime = Point(x + dx - verticalOffset, y + dy - horizontalOffset, 0);
-                Point pFarPlane = Point((x + dx - verticalOffset) * cameraOpening, (y + dy - horizontalOffset) * cameraOpening, 1);
+                Point pNearPlanePrime = Point(x + dx - camPosY, y + dy - camPosX, 0);
+                Point pFarPlane = Point((x + dx - camPosY) * cameraOpening, (y + dy - camPosX) * cameraOpening, 1);
                 NormalisedDirection planeDistance = pNearPlanePrime.NormalisedDirectionTo(pFarPlane);
                 Ray ray{ pNearPlane, planeDistance };
                 colorValue += lightsIntersectSpheres(lights, ray, spheres, backgroundColor, 0) * (1.0 / nbSamples);
 
             }
                 
-            // Normalise the result based on the sampling
+            // Normalise the result based on the samplingS
             colVec[y * WIDTH + x] = colorValue;
         }
     }

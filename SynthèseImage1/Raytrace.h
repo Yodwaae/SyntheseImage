@@ -33,7 +33,6 @@ struct Light {
         double power;
 };
 
-// TODO Add the behavior (metal, glass, ...)
 class Material {
 
 private:
@@ -85,6 +84,10 @@ struct Object {
         Sphere sphere;
 };
 
+struct Shape {
+
+};
+
 #pragma endregion
 
 
@@ -94,7 +97,7 @@ struct Object {
 
 tuple<const Sphere*, double> rayIntersectSpheres(const Ray& ray, const vector<Sphere>& spheres);
 Color lightsIntersectSpheres(const vector<Light>& lights, const Ray& ray, const vector<Sphere>& spheres, const Color& backgroundColor, int depth);
-vector<Color> computeSpheresIntersect(const vector<Light>& lights, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor = { 255, 0, 220 });
+vector<Color> computeSpheresIntersect(int camPosX, int camPosY, const vector<Light>& lights, const vector<Sphere>& spheres, double cameraOpening, int WIDTH, int HEIGHT, Color backgroundColor = { 255, 0, 220 });
 
 #pragma endregion
 

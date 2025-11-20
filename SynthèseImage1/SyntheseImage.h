@@ -30,7 +30,6 @@ static constexpr double EPSILON = 1e-9;
 constexpr double GAMMA_CORRECTION = 1.0 / 2.2;
 
 
-// TODO Not a huge fan of this approach by macro see a better solution that allows do define new operator in crtp derived classes without overwritting the sale ioeratir with differents signatures
 #define INHERIT_CRTP_OPERATORS(CLASS) \
     using Vector3CRTP<CLASS>::operator*; \
     using Vector3CRTP<CLASS>::operator/;
@@ -110,7 +109,7 @@ class Vector3 {
 		double getB() const { return _b; }
 		double getC() const { return _c; }
 
-		// SETTERS //TODO To see if I keep them (useful in the color class (clamp))
+		// SETTERS
 		void setA(double value) { _a = value; }
 		void setB(double value) { _b = value; }
 		void setC(double value) { _c = value; }
